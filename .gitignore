@@ -11,7 +11,22 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+android/app/google-services.json
+
 4pilot/
+
+# Firebase / secrets
+# NOTE: Client-side Firebase API keys are not “secret”, but these files are still
+# best treated as environment-specific configuration.
+lib/firebase_options.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+
+# Android signing
+**/*.jks
+**/*.keystore
+android/key.properties
 
 # IntelliJ related
 *.iml
