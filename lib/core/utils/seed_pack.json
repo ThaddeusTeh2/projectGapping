@@ -1,0 +1,1089 @@
+{
+  "meta": {
+    "generatedAtIso": "2026-01-20T00:00:00Z",
+    "generatedAtMillis": 1768867200000,
+    "notes": "closingTimeMillis values are based on generatedAtMillis + (1h/6h/24h/3d). If importing much later, consider shifting closingTimeMillis forward. IDs are stable so you can re-import safely if you clear collections first."
+  },
+  "motorcycles": [
+    {
+      "id": "bike_001",
+      "data": {
+        "brandKey": "kawasaki",
+        "brandLabel": "Kawasaki",
+        "category": "Sport",
+        "displacementBucket": "251_400",
+        "displacementCc": 399,
+        "title": "Ninja 400",
+        "titleLower": "ninja 400",
+        "desc": "Lightweight sport platform with approachable power and strong aftermarket.",
+        "releaseYear": 2018,
+        "dateCreatedMillis": 1756684800000,
+        "seaPricingNote": "Often priced as an entry sport; check service history and tire age.",
+        "seaFuelNote": "Efficient for a sport bike; steady throttle mapping helps city riding.",
+        "seaPartsNote": "Parts availability generally good; common consumables are easy to source."
+      }
+    },
+    {
+      "id": "bike_002",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Sport",
+        "displacementBucket": "251_400",
+        "displacementCc": 286,
+        "title": "CBR300R",
+        "titleLower": "cbr300r",
+        "desc": "Beginner-friendly single-cylinder sport styling with low running costs.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1754006400000,
+        "seaPricingNote": "Good value used; watch for cosmetic drops.",
+        "seaFuelNote": "Very efficient; ideal for commuting.",
+        "seaPartsNote": "Honda parts are widespread; service is straightforward."
+      }
+    },
+    {
+      "id": "bike_003",
+      "data": {
+        "brandKey": "yamaha",
+        "brandLabel": "Yamaha",
+        "category": "Sport",
+        "displacementBucket": "251_400",
+        "displacementCc": 321,
+        "title": "YZF-R3",
+        "titleLower": "yzf-r3",
+        "desc": "Balanced small-displacement sport with smooth twin-cylinder character.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1751328000000,
+        "seaPricingNote": "Prices hold; prioritize ABS models where possible.",
+        "seaFuelNote": "Efficient twin; consistent range for city/highway mix.",
+        "seaPartsNote": "Aftermarket strong; fairing parts can add cost."
+      }
+    },
+    {
+      "id": "bike_004",
+      "data": {
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Sport",
+        "displacementBucket": "401_650",
+        "displacementCc": 645,
+        "title": "SV650 (S)",
+        "titleLower": "sv650 (s)",
+        "desc": "V-twin middleweight with usable torque and simple mechanics.",
+        "releaseYear": 2017,
+        "dateCreatedMillis": 1748736000000,
+        "seaPricingNote": "Check for maintenance records; valve checks matter.",
+        "seaFuelNote": "Moderate consumption; gearing affects city feel.",
+        "seaPartsNote": "Parts generally available; aftermarket huge."
+      }
+    },
+    {
+      "id": "bike_005",
+      "data": {
+        "brandKey": "bmw",
+        "brandLabel": "BMW",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 1254,
+        "title": "R 1250 GS",
+        "titleLower": "r 1250 gs",
+        "desc": "Flagship adventure-tourer with long-distance comfort and electronics.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1746057600000,
+        "seaPricingNote": "Higher entry price; confirm service history and options package.",
+        "seaFuelNote": "Range depends on load; touring setups typically manageable.",
+        "seaPartsNote": "Dealer network matters; OEM parts can be pricey."
+      }
+    },
+    {
+      "id": "bike_006",
+      "data": {
+        "brandKey": "ducati",
+        "brandLabel": "Ducati",
+        "category": "Naked",
+        "displacementBucket": "651_plus",
+        "displacementCc": 659,
+        "title": "Monster 659",
+        "titleLower": "monster 659",
+        "desc": "Urban-focused naked with lively character and premium feel.",
+        "releaseYear": 2016,
+        "dateCreatedMillis": 1743465600000,
+        "seaPricingNote": "Service intervals and previous ownership quality are critical.",
+        "seaFuelNote": "Depends on riding style; stop-start can increase consumption.",
+        "seaPartsNote": "OEM parts cost higher; plan for maintenance."
+      }
+    },
+    {
+      "id": "bike_007",
+      "data": {
+        "brandKey": "ktm",
+        "brandLabel": "KTM",
+        "category": "Naked",
+        "displacementBucket": "251_400",
+        "displacementCc": 373,
+        "title": "390 Duke",
+        "titleLower": "390 duke",
+        "desc": "Aggressive lightweight naked with sharp handling.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1740873600000,
+        "seaPricingNote": "Check cooling system and regular servicing.",
+        "seaFuelNote": "Efficient for performance; real-world varies.",
+        "seaPartsNote": "Some parts may require lead time depending on region."
+      }
+    },
+    {
+      "id": "bike_008",
+      "data": {
+        "brandKey": "triumph",
+        "brandLabel": "Triumph",
+        "category": "Naked",
+        "displacementBucket": "651_plus",
+        "displacementCc": 765,
+        "title": "Street Triple 765",
+        "titleLower": "street triple 765",
+        "desc": "Three-cylinder naked with strong midrange and track-capable chassis.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1738281600000,
+        "seaPricingNote": "Inspect for crash damage; many are ridden hard.",
+        "seaFuelNote": "Moderate; throttle use drives consumption.",
+        "seaPartsNote": "Parts availability varies; OEM can be expensive."
+      }
+    },
+    {
+      "id": "bike_009",
+      "data": {
+        "brandKey": "aprilia",
+        "brandLabel": "Aprilia",
+        "category": "Sport",
+        "displacementBucket": "651_plus",
+        "displacementCc": 660,
+        "title": "RS 660",
+        "titleLower": "rs 660",
+        "desc": "Modern middleweight sport with strong electronics package.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1735689600000,
+        "seaPricingNote": "Verify warranty/recalls; service history important.",
+        "seaFuelNote": "Depends on pace; touring can be reasonable.",
+        "seaPartsNote": "OEM parts may have lead time."
+      }
+    },
+    {
+      "id": "bike_010",
+      "data": {
+        "brandKey": "harley_davidson",
+        "brandLabel": "Harley Davidson",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 883,
+        "title": "Sportster Iron 883",
+        "titleLower": "sportster iron 883",
+        "desc": "Classic cruiser styling with simple torque delivery.",
+        "releaseYear": 2018,
+        "dateCreatedMillis": 1733097600000,
+        "seaPricingNote": "Watch for mods; stock bikes tend to resell easier.",
+        "seaFuelNote": "Moderate; city riding reduces range.",
+        "seaPartsNote": "Parts availability generally good; aftermarket huge."
+      }
+    },
+    {
+      "id": "bike_011",
+      "data": {
+        "brandKey": "vespa",
+        "brandLabel": "Vespa",
+        "category": "Scooter",
+        "displacementBucket": "0_150",
+        "displacementCc": 150,
+        "title": "Primavera 150",
+        "titleLower": "primavera 150",
+        "desc": "City scooter with iconic design and easy ownership.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1730505600000,
+        "seaPricingNote": "Check body panels for drops; paintwork can be costly.",
+        "seaFuelNote": "Very efficient; great for urban trips.",
+        "seaPartsNote": "Parts can be pricier than generic scooters."
+      }
+    },
+    {
+      "id": "bike_012",
+      "data": {
+        "brandKey": "cfmoto",
+        "brandLabel": "CFMOTO",
+        "category": "Adventure",
+        "displacementBucket": "401_650",
+        "displacementCc": 649,
+        "title": "650MT",
+        "titleLower": "650mt",
+        "desc": "Value-oriented adventure-touring platform with practical ergonomics.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1727827200000,
+        "seaPricingNote": "Strong value; verify dealer support for servicing.",
+        "seaFuelNote": "Reasonable consumption; depends on load.",
+        "seaPartsNote": "Parts availability depends on local distributor."
+      }
+    },
+
+    {
+      "id": "bike_013",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Scooter",
+        "displacementBucket": "0_150",
+        "displacementCc": 149,
+        "title": "PCX 150",
+        "titleLower": "pcx 150",
+        "desc": "Comfortable commuter scooter with excellent practicality.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1725235200000,
+        "seaPricingNote": "Check CVT service intervals and tire wear.",
+        "seaFuelNote": "High fuel efficiency; great for daily commuting.",
+        "seaPartsNote": "Parts easy to source; servicing is common."
+      }
+    },
+    {
+      "id": "bike_014",
+      "data": {
+        "brandKey": "yamaha",
+        "brandLabel": "Yamaha",
+        "category": "Scooter",
+        "displacementBucket": "151_250",
+        "displacementCc": 155,
+        "title": "NMAX 155",
+        "titleLower": "nmax 155",
+        "desc": "Sporty commuter scooter with strong reliability.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1722643200000,
+        "seaPricingNote": "Look for regular oil changes and clean CVT case.",
+        "seaFuelNote": "Efficient; consistent for city usage.",
+        "seaPartsNote": "Yamaha parts generally available."
+      }
+    },
+    {
+      "id": "bike_015",
+      "data": {
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Scooter",
+        "displacementBucket": "151_250",
+        "displacementCc": 200,
+        "title": "Burgman 200",
+        "titleLower": "burgman 200",
+        "desc": "Comfort-focused scooter with storage and relaxed ergonomics.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1720051200000,
+        "seaPricingNote": "Inspect for belt wear and neglected servicing.",
+        "seaFuelNote": "Moderate; heavier scooters consume more.",
+        "seaPartsNote": "Parts generally OK; body panels may cost more."
+      }
+    },
+    {
+      "id": "bike_016",
+      "data": {
+        "brandKey": "kawasaki",
+        "brandLabel": "Kawasaki",
+        "category": "Naked",
+        "displacementBucket": "401_650",
+        "displacementCc": 649,
+        "title": "Z650",
+        "titleLower": "z650",
+        "desc": "Friendly middleweight naked with approachable power delivery.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1717459200000,
+        "seaPricingNote": "Check for drops; naked bikes show bar-end damage.",
+        "seaFuelNote": "Efficient if ridden moderately.",
+        "seaPartsNote": "Parts readily available; common platform."
+      }
+    },
+    {
+      "id": "bike_017",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Naked",
+        "displacementBucket": "401_650",
+        "displacementCc": 649,
+        "title": "CB650R",
+        "titleLower": "cb650r",
+        "desc": "Inline-four naked with smooth power and modern styling.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1714867200000,
+        "seaPricingNote": "Check service history; many are used for commuting.",
+        "seaFuelNote": "Fuel use increases with high revs.",
+        "seaPartsNote": "Honda parts availability is strong."
+      }
+    },
+    {
+      "id": "bike_018",
+      "data": {
+        "brandKey": "bmw",
+        "brandLabel": "BMW",
+        "category": "Naked",
+        "displacementBucket": "651_plus",
+        "displacementCc": 895,
+        "title": "F 900 R",
+        "titleLower": "f 900 r",
+        "desc": "Modern naked with touring capability and safety tech.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1712275200000,
+        "seaPricingNote": "Options packages vary; confirm what’s included.",
+        "seaFuelNote": "Moderate; best for mixed riding.",
+        "seaPartsNote": "OEM parts can be costly; dealer support matters."
+      }
+    },
+    {
+      "id": "bike_019",
+      "data": {
+        "brandKey": "triumph",
+        "brandLabel": "Triumph",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 900,
+        "title": "Tiger 900",
+        "titleLower": "tiger 900",
+        "desc": "Adventure bike with strong midrange and good touring ergonomics.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1709683200000,
+        "seaPricingNote": "Inspect for offroad wear; check spokes and rims.",
+        "seaFuelNote": "Touring range depends on setup.",
+        "seaPartsNote": "Parts availability varies by region."
+      }
+    },
+    {
+      "id": "bike_020",
+      "data": {
+        "brandKey": "ktm",
+        "brandLabel": "KTM",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 799,
+        "title": "790 Adventure",
+        "titleLower": "790 adventure",
+        "desc": "Lightweight-ish adventure with offroad bias and strong suspension.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1707091200000,
+        "seaPricingNote": "Check electronics and service intervals.",
+        "seaFuelNote": "Range depends on riding; offroad uses more.",
+        "seaPartsNote": "Some parts may require lead time."
+      }
+    },
+
+    {
+      "id": "bike_021",
+      "data": {
+        "brandKey": "yamaha",
+        "brandLabel": "Yamaha",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 689,
+        "title": "Ténéré 700",
+        "titleLower": "ténéré 700",
+        "desc": "Adventure platform with reliable CP2 engine and simple spec.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1704499200000,
+        "seaPricingNote": "Prices can be high; check for offroad damage.",
+        "seaFuelNote": "Good range for touring.",
+        "seaPartsNote": "Parts availability generally good."
+      }
+    },
+    {
+      "id": "bike_022",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 1084,
+        "title": "Africa Twin 1100",
+        "titleLower": "africa twin 1100",
+        "desc": "Touring-capable adventure bike with offroad pedigree.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1701907200000,
+        "seaPricingNote": "Check for hard offroad use; look at forks and frame.",
+        "seaFuelNote": "Touring range depends on speed and luggage.",
+        "seaPartsNote": "Honda parts availability strong."
+      }
+    },
+    {
+      "id": "bike_023",
+      "data": {
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 1037,
+        "title": "V-Strom 1050",
+        "titleLower": "v-strom 1050",
+        "desc": "Adventure-tourer with strong engine and road-focused ergonomics.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1699315200000,
+        "seaPricingNote": "Great touring value; check accessories wiring quality.",
+        "seaFuelNote": "Moderate for displacement.",
+        "seaPartsNote": "Parts generally available."
+      }
+    },
+    {
+      "id": "bike_024",
+      "data": {
+        "brandKey": "ducati",
+        "brandLabel": "Ducati",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "displacementCc": 937,
+        "title": "Multistrada 950",
+        "titleLower": "multistrada 950",
+        "desc": "Sporty adventure-tourer with premium feel and strong electronics.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1696723200000,
+        "seaPricingNote": "Maintenance costs higher; service history is key.",
+        "seaFuelNote": "Depends heavily on riding style.",
+        "seaPartsNote": "OEM parts can be expensive; plan ahead."
+      }
+    },
+    {
+      "id": "bike_025",
+      "data": {
+        "brandKey": "harley_davidson",
+        "brandLabel": "Harley Davidson",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 1746,
+        "title": "Softail Standard 107",
+        "titleLower": "softail standard 107",
+        "desc": "Big-bore cruiser with strong torque and classic stance.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1694131200000,
+        "seaPricingNote": "Inspect for aftermarket wiring; keep mods tidy.",
+        "seaFuelNote": "Heavier bike; city range can drop.",
+        "seaPartsNote": "Aftermarket huge; OEM parts accessible."
+      }
+    },
+
+    {
+      "id": "bike_026",
+      "data": {
+        "brandKey": "kawasaki",
+        "brandLabel": "Kawasaki",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 903,
+        "title": "Vulcan S",
+        "titleLower": "vulcan s",
+        "desc": "Modern cruiser with adjustable ergonomics and friendly handling.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1691539200000,
+        "seaPricingNote": "Good value; check for cosmetic wear.",
+        "seaFuelNote": "Moderate; depends on pace.",
+        "seaPartsNote": "Parts generally available."
+      }
+    },
+    {
+      "id": "bike_027",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 745,
+        "title": "Rebel 500",
+        "titleLower": "rebel 500",
+        "desc": "Approachable cruiser with low seat and smooth twin.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1688947200000,
+        "seaPricingNote": "Usually reliable; check for drops.",
+        "seaFuelNote": "Efficient; good commuter cruiser.",
+        "seaPartsNote": "Honda parts are easy to find."
+      }
+    },
+    {
+      "id": "bike_028",
+      "data": {
+        "brandKey": "yamaha",
+        "brandLabel": "Yamaha",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 942,
+        "title": "Bolt R-Spec",
+        "titleLower": "bolt r-spec",
+        "desc": "Compact cruiser with strong low-end torque and simple styling.",
+        "releaseYear": 2018,
+        "dateCreatedMillis": 1686355200000,
+        "seaPricingNote": "Check belt/chain setup and custom parts quality.",
+        "seaFuelNote": "Moderate; short trips reduce efficiency.",
+        "seaPartsNote": "Aftermarket availability decent."
+      }
+    },
+    {
+      "id": "bike_029",
+      "data": {
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 805,
+        "title": "Boulevard M50",
+        "titleLower": "boulevard m50",
+        "desc": "Comfort cruiser with easy maintenance and relaxed riding.",
+        "releaseYear": 2017,
+        "dateCreatedMillis": 1683763200000,
+        "seaPricingNote": "Inspect for rust and long-term storage issues.",
+        "seaFuelNote": "Moderate; depends on use.",
+        "seaPartsNote": "Parts availability generally good."
+      }
+    },
+    {
+      "id": "bike_030",
+      "data": {
+        "brandKey": "bmw",
+        "brandLabel": "BMW",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "displacementCc": 1802,
+        "title": "R 18",
+        "titleLower": "r 18",
+        "desc": "Large-displacement cruiser with distinctive boxer character.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1681171200000,
+        "seaPricingNote": "Verify options and service history.",
+        "seaFuelNote": "Heavier; fuel use varies.",
+        "seaPartsNote": "OEM parts can be expensive; dealer support matters."
+      }
+    },
+
+    {
+      "id": "bike_031",
+      "data": {
+        "brandKey": "ktm",
+        "brandLabel": "KTM",
+        "category": "Offroad",
+        "displacementBucket": "251_400",
+        "displacementCc": 350,
+        "title": "350 EXC-F",
+        "titleLower": "350 exc-f",
+        "desc": "Street-legal enduro with strong suspension and lightweight feel.",
+        "releaseYear": 2020,
+        "dateCreatedMillis": 1678579200000,
+        "seaPricingNote": "Hours and maintenance matter more than mileage.",
+        "seaFuelNote": "Short-range by design; carry fuel if needed.",
+        "seaPartsNote": "Maintenance parts common; OEM can be pricey."
+      }
+    },
+    {
+      "id": "bike_032",
+      "data": {
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Offroad",
+        "displacementBucket": "151_250",
+        "displacementCc": 249,
+        "title": "CRF250L",
+        "titleLower": "crf250l",
+        "desc": "Dual-sport with reliability focus and manageable power.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1675987200000,
+        "seaPricingNote": "Check for trail damage and maintenance records.",
+        "seaFuelNote": "Efficient for dual-sport; range depends on gearing.",
+        "seaPartsNote": "Honda parts availability strong."
+      }
+    },
+    {
+      "id": "bike_033",
+      "data": {
+        "brandKey": "yamaha",
+        "brandLabel": "Yamaha",
+        "category": "Offroad",
+        "displacementBucket": "151_250",
+        "displacementCc": 250,
+        "title": "WR250R",
+        "titleLower": "wr250r",
+        "desc": "Dual-sport with strong reliability and better suspension.",
+        "releaseYear": 2018,
+        "dateCreatedMillis": 1673395200000,
+        "seaPricingNote": "Often priced higher due to demand; inspect carefully.",
+        "seaFuelNote": "Efficient; depends on trail usage.",
+        "seaPartsNote": "Parts availability decent; aftermarket exists."
+      }
+    },
+    {
+      "id": "bike_034",
+      "data": {
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Offroad",
+        "displacementBucket": "251_400",
+        "displacementCc": 398,
+        "title": "DR-Z400S",
+        "titleLower": "dr-z400s",
+        "desc": "Simple dual-sport with strong community support.",
+        "releaseYear": 2017,
+        "dateCreatedMillis": 1670803200000,
+        "seaPricingNote": "Check carb tuning and common wear points.",
+        "seaFuelNote": "Moderate; gearing affects efficiency.",
+        "seaPartsNote": "Aftermarket huge; parts easy to source."
+      }
+    },
+    {
+      "id": "bike_035",
+      "data": {
+        "brandKey": "kawasaki",
+        "brandLabel": "Kawasaki",
+        "category": "Offroad",
+        "displacementBucket": "151_250",
+        "displacementCc": 249,
+        "title": "KLX250",
+        "titleLower": "klx250",
+        "desc": "Beginner-friendly dual-sport with simple maintenance.",
+        "releaseYear": 2016,
+        "dateCreatedMillis": 1668211200000,
+        "seaPricingNote": "Inspect for trail wear and maintenance.",
+        "seaFuelNote": "Efficient; light weight helps.",
+        "seaPartsNote": "Parts availability generally good."
+      }
+    },
+
+    {
+      "id": "bike_036",
+      "data": {
+        "brandKey": "vespa",
+        "brandLabel": "Vespa",
+        "category": "Scooter",
+        "displacementBucket": "0_150",
+        "displacementCc": 125,
+        "title": "Sprint 125",
+        "titleLower": "sprint 125",
+        "desc": "Compact city scooter with classic style.",
+        "releaseYear": 2022,
+        "dateCreatedMillis": 1665619200000,
+        "seaPricingNote": "Check panel alignment and paint condition.",
+        "seaFuelNote": "Excellent economy.",
+        "seaPartsNote": "OEM parts can be pricier; plan servicing."
+      }
+    },
+    {
+      "id": "bike_037",
+      "data": {
+        "brandKey": "cfmoto",
+        "brandLabel": "CFMOTO",
+        "category": "Sport",
+        "displacementBucket": "401_650",
+        "displacementCc": 649,
+        "title": "650NK",
+        "titleLower": "650nk",
+        "desc": "Value middleweight naked/sport-leaning platform.",
+        "releaseYear": 2019,
+        "dateCreatedMillis": 1663027200000,
+        "seaPricingNote": "Check dealer support and service records.",
+        "seaFuelNote": "Moderate; depends on commute speed.",
+        "seaPartsNote": "Parts availability depends on region."
+      }
+    },
+    {
+      "id": "bike_038",
+      "data": {
+        "brandKey": "ducati",
+        "brandLabel": "Ducati",
+        "category": "Sport",
+        "displacementBucket": "651_plus",
+        "displacementCc": 955,
+        "title": "Panigale V2",
+        "titleLower": "panigale v2",
+        "desc": "Track-ready sport bike with premium components.",
+        "releaseYear": 2021,
+        "dateCreatedMillis": 1660435200000,
+        "seaPricingNote": "Service history is everything; check for track use.",
+        "seaFuelNote": "Performance-focused; consumption rises quickly.",
+        "seaPartsNote": "OEM parts expensive; plan maintenance."
+      }
+    },
+    {
+      "id": "bike_039",
+      "data": {
+        "brandKey": "aprilia",
+        "brandLabel": "Aprilia",
+        "category": "Naked",
+        "displacementBucket": "401_650",
+        "displacementCc": 457,
+        "title": "Tuono 457",
+        "titleLower": "tuono 457",
+        "desc": "Compact naked aimed at new riders with sporty ergonomics.",
+        "releaseYear": 2025,
+        "dateCreatedMillis": 1657843200000,
+        "seaPricingNote": "Newer model; verify dealer support and warranty.",
+        "seaFuelNote": "Likely efficient; real-world depends on tuning.",
+        "seaPartsNote": "OEM parts lead time may vary."
+      }
+    },
+    {
+      "id": "bike_040",
+      "data": {
+        "brandKey": "triumph",
+        "brandLabel": "Triumph",
+        "category": "Sport",
+        "displacementBucket": "651_plus",
+        "displacementCc": 660,
+        "title": "Daytona 660",
+        "titleLower": "daytona 660",
+        "desc": "Modern sport platform with usable street power.",
+        "releaseYear": 2024,
+        "dateCreatedMillis": 1655251200000,
+        "seaPricingNote": "Confirm servicing and ensure recall updates are done.",
+        "seaFuelNote": "Moderate; depends on riding style.",
+        "seaPartsNote": "Parts availability varies; check local dealer."
+      }
+    }
+  ],
+  "listings": [
+    {
+      "id": "listing_001",
+      "data": {
+        "bikeId": "bike_001",
+        "sellerId": "seed_seller_a",
+        "brandKey": "kawasaki",
+        "brandLabel": "Kawasaki",
+        "category": "Sport",
+        "displacementBucket": "251_400",
+        "bikeTitle": "Ninja 400",
+        "hasBid": true,
+        "startingBid": 6000.0,
+        "currentBid": 7200.0,
+        "buyOutPrice": 9000.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768888800000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Clean title, daily ridden, recent tires."
+      }
+    },
+    {
+      "id": "listing_002",
+      "data": {
+        "bikeId": "bike_011",
+        "sellerId": "seed_seller_a",
+        "brandKey": "vespa",
+        "brandLabel": "Vespa",
+        "category": "Scooter",
+        "displacementBucket": "0_150",
+        "bikeTitle": "Primavera 150",
+        "hasBid": false,
+        "startingBid": 3500.0,
+        "currentBid": null,
+        "buyOutPrice": 5200.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768953600000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Mostly city use, stored indoors."
+      }
+    },
+    {
+      "id": "listing_003",
+      "data": {
+        "bikeId": "bike_007",
+        "sellerId": "seed_seller_b",
+        "brandKey": "ktm",
+        "brandLabel": "KTM",
+        "category": "Naked",
+        "displacementBucket": "251_400",
+        "bikeTitle": "390 Duke",
+        "hasBid": true,
+        "startingBid": 4500.0,
+        "currentBid": 5100.0,
+        "buyOutPrice": 6800.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768870800000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Recent service, lightweight and fun."
+      }
+    },
+    {
+      "id": "listing_004",
+      "data": {
+        "bikeId": "bike_005",
+        "sellerId": "seed_seller_c",
+        "brandKey": "bmw",
+        "brandLabel": "BMW",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "bikeTitle": "R 1250 GS",
+        "hasBid": false,
+        "startingBid": 68000.0,
+        "currentBid": null,
+        "buyOutPrice": 82000.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1769126400000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Tour-ready, accessories included."
+      }
+    },
+    {
+      "id": "listing_005",
+      "data": {
+        "bikeId": "bike_027",
+        "sellerId": "seed_seller_b",
+        "brandKey": "honda",
+        "brandLabel": "Honda",
+        "category": "Cruiser",
+        "displacementBucket": "651_plus",
+        "bikeTitle": "Rebel 500",
+        "hasBid": true,
+        "startingBid": 16000.0,
+        "currentBid": 17100.0,
+        "buyOutPrice": 20500.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768953600000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Low seat, easy handling, great commuter."
+      }
+    },
+    {
+      "id": "listing_006",
+      "data": {
+        "bikeId": "bike_034",
+        "sellerId": "seed_seller_a",
+        "brandKey": "suzuki",
+        "brandLabel": "Suzuki",
+        "category": "Offroad",
+        "displacementBucket": "251_400",
+        "bikeTitle": "DR-Z400S",
+        "hasBid": false,
+        "startingBid": 12000.0,
+        "currentBid": null,
+        "buyOutPrice": 15500.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768888800000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Dual-sport setup, clean plastics, runs strong."
+      }
+    },
+    {
+      "id": "listing_007",
+      "data": {
+        "bikeId": "bike_012",
+        "sellerId": "seed_seller_c",
+        "brandKey": "cfmoto",
+        "brandLabel": "CFMOTO",
+        "category": "Adventure",
+        "displacementBucket": "401_650",
+        "bikeTitle": "650MT",
+        "hasBid": true,
+        "startingBid": 14500.0,
+        "currentBid": 15200.0,
+        "buyOutPrice": 18900.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1769126400000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Great value, touring-ready, comfy ergos."
+      }
+    },
+    {
+      "id": "listing_008",
+      "data": {
+        "bikeId": "bike_009",
+        "sellerId": "seed_seller_b",
+        "brandKey": "aprilia",
+        "brandLabel": "Aprilia",
+        "category": "Sport",
+        "displacementBucket": "651_plus",
+        "bikeTitle": "RS 660",
+        "hasBid": true,
+        "startingBid": 42000.0,
+        "currentBid": 44100.0,
+        "buyOutPrice": 49900.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768870800000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Well-kept, premium feel, quickshifter equipped."
+      }
+    },
+    {
+      "id": "listing_009",
+      "data": {
+        "bikeId": "bike_020",
+        "sellerId": "seed_seller_a",
+        "brandKey": "ktm",
+        "brandLabel": "KTM",
+        "category": "Adventure",
+        "displacementBucket": "651_plus",
+        "bikeTitle": "790 Adventure",
+        "hasBid": false,
+        "startingBid": 36000.0,
+        "currentBid": null,
+        "buyOutPrice": 42500.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768953600000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Adventure-ready, suspension serviced, clean."
+      }
+    },
+    {
+      "id": "listing_010",
+      "data": {
+        "bikeId": "bike_038",
+        "sellerId": "seed_seller_c",
+        "brandKey": "ducati",
+        "brandLabel": "Ducati",
+        "category": "Sport",
+        "displacementBucket": "651_plus",
+        "bikeTitle": "Panigale V2",
+        "hasBid": true,
+        "startingBid": 79000.0,
+        "currentBid": 81200.0,
+        "buyOutPrice": 89900.0,
+        "dateCreatedMillis": 1768867200000,
+        "closingTimeMillis": 1768888800000,
+        "isClosed": false,
+        "closedAtMillis": null,
+        "closingBid": null,
+        "listingComments": "Track-capable, meticulous maintenance, garage kept."
+      }
+    }
+  ],
+  "comments": [
+    {
+      "id": "comment_001",
+      "data": {
+        "bikeId": "bike_001",
+        "userId": "seed_user_a",
+        "commentTitle": "Common issues?",
+        "comment": "Check chain maintenance and look for any crash evidence on fairings.",
+        "tags": ["maintenance"],
+        "upvoteCount": 12,
+        "downvoteCount": 1,
+        "dateCreatedMillis": 1768867200000
+      }
+    }
+    ,
+    {
+      "id": "comment_002",
+      "data": {
+        "bikeId": "bike_001",
+        "userId": "seed_user_b",
+        "commentTitle": "Good beginner choice",
+        "comment": "Power is manageable and parts are easy to find. Great first sport bike.",
+        "tags": ["beginner"],
+        "upvoteCount": 7,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_003",
+      "data": {
+        "bikeId": "bike_011",
+        "userId": "seed_user_c",
+        "commentTitle": "City practicality",
+        "comment": "Super easy to park and fuel costs are low. Watch for scratches on panels.",
+        "tags": ["city"],
+        "upvoteCount": 5,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_004",
+      "data": {
+        "bikeId": "bike_011",
+        "userId": "seed_user_a",
+        "commentTitle": "Maintenance tip",
+        "comment": "Keep an eye on tire pressure; small wheels feel it more.",
+        "tags": ["maintenance"],
+        "upvoteCount": 2,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_005",
+      "data": {
+        "bikeId": "bike_007",
+        "userId": "seed_user_b",
+        "commentTitle": "Fun chassis",
+        "comment": "Lightweight with sharp steering. Check cooling and keep up with service.",
+        "tags": ["handling"],
+        "upvoteCount": 6,
+        "downvoteCount": 1,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_006",
+      "data": {
+        "bikeId": "bike_007",
+        "userId": "seed_user_c",
+        "commentTitle": "Value holds",
+        "comment": "These tend to sell fast; document mods and keep receipts.",
+        "tags": ["pricing"],
+        "upvoteCount": 3,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_007",
+      "data": {
+        "bikeId": "bike_012",
+        "userId": "seed_user_a",
+        "commentTitle": "Touring comfort",
+        "comment": "Ergonomics are decent for the price. Dealer support matters.",
+        "tags": ["touring"],
+        "upvoteCount": 4,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_008",
+      "data": {
+        "bikeId": "bike_012",
+        "userId": "seed_user_b",
+        "commentTitle": "Parts lead time",
+        "comment": "Some parts can take time depending on distributor; plan ahead.",
+        "tags": ["parts"],
+        "upvoteCount": 1,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_009",
+      "data": {
+        "bikeId": "bike_034",
+        "userId": "seed_user_c",
+        "commentTitle": "Simple and durable",
+        "comment": "DR-Z is easy to wrench on. Look for clean maintenance and avoid neglected bikes.",
+        "tags": ["maintenance"],
+        "upvoteCount": 8,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    },
+    {
+      "id": "comment_010",
+      "data": {
+        "bikeId": "bike_034",
+        "userId": "seed_user_a",
+        "commentTitle": "Check carb tuning",
+        "comment": "If it bogs or stalls, carb tuning might be needed; common on older units.",
+        "tags": ["maintenance"],
+        "upvoteCount": 2,
+        "downvoteCount": 0,
+        "dateCreatedMillis": 1768867200000
+      }
+    }
+  ]
+}
