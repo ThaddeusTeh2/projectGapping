@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 android/app/google-services.json
+lib/seeding/serviceAccountKey.json
 
 4pilot/
 
