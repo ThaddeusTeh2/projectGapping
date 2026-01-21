@@ -10,7 +10,7 @@ import '../../di/providers.dart';
 import '../../domain/models/shop_listing.dart';
 
 final _listingsProvider = FutureProvider.autoDispose<List<ShopListing>>((ref) {
-  return ref.watch(listingRepositoryProvider).listListings(limit: 20);
+  return ref.watch(listingRepositoryProvider).listListings(limit: 200);
 });
 
 class ShopDirectoryScreen extends ConsumerWidget {
@@ -18,7 +18,7 @@ class ShopDirectoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-  final listingsAsync = ref.watch(_listingsProvider);
+    final listingsAsync = ref.watch(_listingsProvider);
 
     return AppScaffold(
       title: 'Shop',
@@ -27,36 +27,43 @@ class ShopDirectoryScreen extends ConsumerWidget {
         label: const Text('Create Listing'),
         icon: const Icon(Icons.add),
       ),
-    body: listingsAsync.when(
-      data: (listings) {
-        if (listings.isEmpty) {
-          return const EmptyStateView(message: 'No listings found.');
-        }
+      body: listingsAsync.when(
+        data: (listings) {
+          final openListings = listings.where((l) => !l.isClosed).toList();
+          openListings.sort(
+            (a, b) => b.dateCreatedMillis.compareTo(a.dateCreatedMillis),
+          );
 
-        return ListView(
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: Text('Shop listings (Day 2: repo read sanity check).'),
-            ),
-            for (final listing in listings)
-              ListTile(
-                title: Text(listing.bikeTitle),
-                subtitle: Text(
-                  '${listing.brandLabel} · ${listing.category} · ${listing.displacementBucket}',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.go('/listing/${listing.id}'),
+          final visible = openListings.take(20).toList(growable: false);
+
+          if (visible.isEmpty) {
+            return const EmptyStateView(message: 'No listings found.');
+          }
+
+          return ListView(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text('Shop listings (Day 2: repo read sanity check).'),
               ),
-          ],
-        );
-      },
-      error: (error, _) => ErrorStateView(
-        message: 'Failed to load listings.',
-        onRetry: () => ref.invalidate(_listingsProvider),
+              for (final listing in visible)
+                ListTile(
+                  title: Text(listing.bikeTitle),
+                  subtitle: Text(
+                    '${listing.brandLabel} · ${listing.category} · ${listing.displacementBucket}',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.go('/listing/${listing.id}'),
+                ),
+            ],
+          );
+        },
+        error: (error, _) => ErrorStateView(
+          message: 'Failed to load listings.',
+          onRetry: () => ref.invalidate(_listingsProvider),
+        ),
+        loading: () => const LoadingView(message: 'Loading listings…'),
       ),
-      loading: () => const LoadingView(message: 'Loading listings…'),
-    ),
     );
   }
 }

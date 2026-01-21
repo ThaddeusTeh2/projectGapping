@@ -52,7 +52,6 @@ class FirestoreUserRepository implements UserRepository {
   }) async {
     final snapshot = await _listings
         .where('sellerId', isEqualTo: userId)
-        .orderBy('dateCreatedMillis', descending: true)
         .limit(limit)
         .get();
     return snapshot.docs
@@ -64,7 +63,6 @@ class FirestoreUserRepository implements UserRepository {
   Future<List<Bid>> listMyBids(String userId, {int limit = 50}) async {
     final snapshot = await _bids
         .where('bidderId', isEqualTo: userId)
-        .orderBy('dateCreatedMillis', descending: true)
         .limit(limit)
         .get();
     return snapshot.docs

@@ -68,14 +68,43 @@ class BikeDirectoryViewModel extends AutoDisposeNotifier<BikeDirectoryState> {
 
     final repo = ref.read(bikeRepositoryProvider);
 
-    final result = await AsyncValue.guard(() {
-      return repo.listBikes(
-        brandKey: state.brandKey,
-        category: state.category?.label,
-        displacementBucket: state.displacementBucket?.key,
-        sort: state.sort,
-        limit: 40,
-      );
+    final result = await AsyncValue.guard(() async {
+      // Firestore strategy: fetch broad, then filter/sort locally.
+      // This avoids needing composite indexes for every filter/sort combo.
+      final fetched = await repo.listBikes(limit: 500);
+
+      Iterable<Bike> filtered = fetched;
+
+      final selectedBrandKey = state.brandKey;
+      final selectedCategory = state.category;
+      final selectedBucket = state.displacementBucket;
+
+      if (selectedBrandKey != null) {
+        filtered = filtered.where((b) => b.brandKey == selectedBrandKey);
+      }
+      if (selectedCategory != null) {
+        filtered = filtered.where((b) => b.category == selectedCategory.label);
+      }
+      if (selectedBucket != null) {
+        filtered = filtered.where((b) => b.displacementBucket == selectedBucket.key);
+      }
+
+      final list = filtered.toList(growable: false);
+
+      // Apply chosen sort locally.
+      final sorted = List<Bike>.of(list);
+      switch (state.sort) {
+        case BikeSort.titleAsc:
+          sorted.sort((a, b) => a.titleLower.compareTo(b.titleLower));
+        case BikeSort.dateCreatedDesc:
+          sorted.sort(
+            (a, b) => b.dateCreatedMillis.compareTo(a.dateCreatedMillis),
+          );
+        case BikeSort.releaseYearDesc:
+          sorted.sort((a, b) => b.releaseYear.compareTo(a.releaseYear));
+      }
+
+      return sorted;
     });
 
     state = state.copyWith(bikes: result);

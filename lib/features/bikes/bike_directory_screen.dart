@@ -141,7 +141,8 @@ class BikeDirectoryScreen extends ConsumerWidget {
                   child: const Chip(label: Text('Sort')),
                 ),
                 TextButton(
-                  onPressed: (state.brandKey != null ||
+                  onPressed:
+                      (state.brandKey != null ||
                           state.category != null ||
                           state.displacementBucket != null)
                       ? viewModel.clearFilters
@@ -149,6 +150,13 @@ class BikeDirectoryScreen extends ConsumerWidget {
                   child: const Text('Clear'),
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Note: to avoid Firestore composite-index combinatorics, the app fetches a broad set and filters/sorts locally for demo-scale data.',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
           Expanded(

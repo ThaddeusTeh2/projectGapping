@@ -20,19 +20,21 @@ class FirestoreCommentRepository implements CommentRepository {
     String bikeId, {
     int limit = 50,
   }) {
-    return _col
-        .where('bikeId', isEqualTo: bikeId)
-        .orderBy('dateCreatedMillis', descending: true)
-        .limit(limit)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map(
-                (doc) =>
-                    BikeComment.fromFirestore(id: doc.id, data: doc.data()),
-              )
-              .toList(growable: false),
+    return _col.where('bikeId', isEqualTo: bikeId).limit(limit).snapshots().map(
+      (snapshot) {
+        final list = snapshot.docs
+            .map(
+              (doc) => BikeComment.fromFirestore(id: doc.id, data: doc.data()),
+            )
+            .toList(growable: false);
+
+        final sorted = List<BikeComment>.of(list);
+        sorted.sort(
+          (a, b) => b.dateCreatedMillis.compareTo(a.dateCreatedMillis),
         );
+        return sorted;
+      },
+    );
   }
 
   @override

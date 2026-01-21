@@ -23,24 +23,9 @@ class FirestoreListingRepository implements ListingRepository {
     String? displacementBucket,
     int limit = 50,
   }) async {
-    Query<Map<String, dynamic>> query = _col.where(
-      'isClosed',
-      isEqualTo: isClosed,
-    );
-
-    if (brandKey != null && brandKey.isNotEmpty) {
-      query = query.where('brandKey', isEqualTo: brandKey);
-    }
-    if (category != null && category.isNotEmpty) {
-      query = query.where('category', isEqualTo: category);
-    }
-    if (displacementBucket != null && displacementBucket.isNotEmpty) {
-      query = query.where('displacementBucket', isEqualTo: displacementBucket);
-    }
-
-    query = query.orderBy('dateCreatedMillis', descending: true);
-
-    final snapshot = await query.limit(limit).get();
+    // Intentionally fetch broad and sort/filter locally in the app.
+    // Multi-field filters + orderBy quickly require many composite indexes.
+    final snapshot = await _col.limit(limit).get();
     return snapshot.docs
         .map((doc) => ShopListing.fromFirestore(id: doc.id, data: doc.data()))
         .toList(growable: false);
