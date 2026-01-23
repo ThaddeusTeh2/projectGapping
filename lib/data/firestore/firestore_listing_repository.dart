@@ -26,9 +26,20 @@ class FirestoreListingRepository implements ListingRepository {
     // Intentionally fetch broad and sort/filter locally in the app.
     // Multi-field filters + orderBy quickly require many composite indexes.
     final snapshot = await _col.limit(limit).get();
-    return snapshot.docs
+    final all = snapshot.docs
         .map((doc) => ShopListing.fromFirestore(id: doc.id, data: doc.data()))
         .toList(growable: false);
+
+    // Apply simple local filters so the API contract remains truthful.
+    Iterable<ShopListing> filtered = all;
+    filtered = filtered.where((l) => l.isClosed == isClosed);
+    if (brandKey != null) filtered = filtered.where((l) => l.brandKey == brandKey);
+    if (category != null) filtered = filtered.where((l) => l.category == category);
+    if (displacementBucket != null) {
+      filtered = filtered.where((l) => l.displacementBucket == displacementBucket);
+    }
+
+    return filtered.toList(growable: false);
   }
 
   @override
@@ -50,10 +61,19 @@ class FirestoreListingRepository implements ListingRepository {
   Future<void> closeListing({
     required String listingId,
     required int closedAtMillis,
+    double? closingBid,
   }) {
-    return _col.doc(listingId).update(<String, dynamic>{
+    final update = <String, dynamic>{
       'isClosed': true,
       'closedAtMillis': closedAtMillis,
-    });
+    };
+
+    // Some security rules require `closingBid` to be absent unless it's a real
+    // number matching the existing `currentBid`.
+    if (closingBid != null) {
+      update['closingBid'] = closingBid;
+    }
+
+    return _col.doc(listingId).update(update);
   }
 }

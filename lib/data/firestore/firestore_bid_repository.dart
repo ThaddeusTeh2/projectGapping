@@ -16,9 +16,16 @@ class FirestoreBidRepository implements BidRepository {
     required double amount,
   }) async {
     final callable = _functions.httpsCallable('placeBid');
-    await callable.call(<String, dynamic>{
-      'listingId': listingId,
-      'amount': amount,
-    });
+    try {
+      await callable.call(<String, dynamic>{
+        'listingId': listingId,
+        'amount': amount,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      // SSOT UX: surface server messages from the callable.
+      // Day 6 adds the real function; until then, this still produces a useful error.
+      final message = e.message ?? 'Failed to place bid';
+      throw StateError(message);
+    }
   }
 }

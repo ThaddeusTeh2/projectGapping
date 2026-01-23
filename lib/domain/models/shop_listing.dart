@@ -49,7 +49,7 @@ class ShopListing {
   final String listingComments;
 
   Map<String, dynamic> toFirestore() {
-    return <String, dynamic>{
+    final data = <String, dynamic>{
       'bikeId': bikeId,
       'sellerId': sellerId,
       'brandKey': brandKey,
@@ -59,15 +59,20 @@ class ShopListing {
       'bikeTitle': bikeTitle,
       'hasBid': hasBid,
       'startingBid': startingBid,
-      'currentBid': currentBid,
       'buyOutPrice': buyOutPrice,
       'dateCreatedMillis': dateCreatedMillis,
       'closingTimeMillis': closingTimeMillis,
       'isClosed': isClosed,
-      'closedAtMillis': closedAtMillis,
-      'closingBid': closingBid,
       'listingComments': listingComments,
     };
+
+    // Omit nullable fields when unset. Some security rules require fields to be
+    // absent (not null), e.g. `currentBid` on listing creation.
+    if (currentBid != null) data['currentBid'] = currentBid;
+    if (closedAtMillis != null) data['closedAtMillis'] = closedAtMillis;
+    if (closingBid != null) data['closingBid'] = closingBid;
+
+    return data;
   }
 
   factory ShopListing.fromFirestore({

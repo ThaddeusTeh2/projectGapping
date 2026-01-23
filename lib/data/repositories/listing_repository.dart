@@ -19,5 +19,6 @@ abstract class ListingRepository {
   Future<void> closeListing({
     required String listingId,
     required int closedAtMillis,
+    double? closingBid,
   });
 }

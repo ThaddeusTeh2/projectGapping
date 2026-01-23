@@ -44,10 +44,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _isLoading = true;
     });
 
-    final auth = ref.read(firebaseAuthProvider);
+    final authRepo = ref.read(authRepositoryProvider);
 
     try {
-      await auth.createUserWithEmailAndPassword(
+      await authRepo.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );

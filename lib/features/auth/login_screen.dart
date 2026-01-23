@@ -42,10 +42,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _isLoading = true;
     });
 
-    final auth = ref.read(firebaseAuthProvider);
+    final authRepo = ref.read(authRepositoryProvider);
 
     try {
-      await auth.signInWithEmailAndPassword(
+      await authRepo.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
