@@ -23,20 +23,33 @@ class FirestoreListingRepository implements ListingRepository {
     String? displacementBucket,
     int limit = 50,
   }) async {
-    // Intentionally fetch broad and sort/filter locally in the app.
-    // Multi-field filters + orderBy quickly require many composite indexes.
-    final snapshot = await _col.limit(limit).get();
+    // Day 6 pivot improvement: use a stable server-side query shape that matches
+    // our planned composite index, and keep the remaining filters local.
+    //
+    // If the index is missing, Firestore will throw FAILED_PRECONDITION with a
+    // console URL that can be clicked to create the index.
+    final query = _col
+        .where('isClosed', isEqualTo: isClosed)
+        .orderBy('dateCreatedMillis', descending: true)
+        .limit(limit);
+
+    final snapshot = await query.get();
     final all = snapshot.docs
         .map((doc) => ShopListing.fromFirestore(id: doc.id, data: doc.data()))
         .toList(growable: false);
 
     // Apply simple local filters so the API contract remains truthful.
     Iterable<ShopListing> filtered = all;
-    filtered = filtered.where((l) => l.isClosed == isClosed);
-    if (brandKey != null) filtered = filtered.where((l) => l.brandKey == brandKey);
-    if (category != null) filtered = filtered.where((l) => l.category == category);
+    if (brandKey != null) {
+      filtered = filtered.where((l) => l.brandKey == brandKey);
+    }
+    if (category != null) {
+      filtered = filtered.where((l) => l.category == category);
+    }
     if (displacementBucket != null) {
-      filtered = filtered.where((l) => l.displacementBucket == displacementBucket);
+      filtered = filtered.where(
+        (l) => l.displacementBucket == displacementBucket,
+      );
     }
 
     return filtered.toList(growable: false);

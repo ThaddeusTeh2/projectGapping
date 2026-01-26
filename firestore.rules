@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// DEBUG RULESET (TEMP):
+// Allow any signed-in user to create/update/delete any document.
+// Use only for local/dev debugging; do NOT ship this.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /{document=**} {
+      // Keep reads open for demo/dev convenience.
+      allow read: if true;
+
+      // Write access for any authenticated user.
+      allow create, update, delete: if isSignedIn();
+    }
+  }
+}

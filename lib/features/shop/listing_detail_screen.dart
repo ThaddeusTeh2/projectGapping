@@ -17,6 +17,16 @@ class ListingDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String userMessageFromError(Object error) {
+      // AsyncValue.guard commonly wraps StateError as "Bad state: ...".
+      final raw = error.toString();
+      const badStatePrefix = 'Bad state: ';
+      if (raw.startsWith(badStatePrefix)) {
+        return raw.substring(badStatePrefix.length);
+      }
+      return raw;
+    }
+
     // SSOT Day 5: listing info + bid form + seller controls.
     final state = ref.watch(listingDetailViewModelProvider(listingId));
     final viewModel = ref.read(listingDetailViewModelProvider(listingId).notifier);
@@ -27,7 +37,7 @@ class ListingDetailScreen extends ConsumerWidget {
       listingDetailViewModelProvider(listingId).select((s) => s.mutation),
       (previous, next) {
         if (next.hasError && !next.isLoading) {
-          AppSnackbar.showError(context, next.error.toString());
+          AppSnackbar.showError(context, userMessageFromError(next.error!));
         }
       },
     );

@@ -10,6 +10,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final app = Firebase.app();
+  debugPrint(
+    'Firebase initialized: projectId=${app.options.projectId} appId=${app.options.appId}',
+  );
   runApp(const ProviderScope(child: App()));
 }
 

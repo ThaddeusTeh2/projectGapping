@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../core/utils/time.dart';
 import '../../di/providers.dart';
@@ -65,26 +66,32 @@ class ListingDetailViewModel
     state = state.copyWith(mutation: const AsyncLoading());
 
     final result = await AsyncValue.guard(() async {
-      final listing = state.listing.value;
-      if (listing == null) throw StateError('Listing not found.');
+      try {
+        final listing = state.listing.value;
+        if (listing == null) throw StateError('Listing not found.');
 
-      _requireUid();
+        _requireUid();
 
-      if (listing.isClosed) {
-        throw StateError('Listing already closed.');
+        if (listing.isClosed) {
+          throw StateError('Listing already closed.');
+        }
+        if (nowMillis() >= listing.closingTimeMillis) {
+          // Even before Day 6 function exists, enforce the UX requirement.
+          throw StateError('Bidding has ended.');
+        }
+
+        await ref.read(bidRepositoryProvider).placeBid(
+              listingId: listing.id,
+              amount: amount,
+            );
+
+        // Refresh detail after a successful bid.
+        await _fetchListing();
+      } catch (e, st) {
+        debugPrint('placeBid failed: $e');
+        debugPrintStack(stackTrace: st);
+        rethrow;
       }
-      if (nowMillis() >= listing.closingTimeMillis) {
-        // Even before Day 6 function exists, enforce the UX requirement.
-        throw StateError('Bidding has ended.');
-      }
-
-      await ref.read(bidRepositoryProvider).placeBid(
-            listingId: listing.id,
-            amount: amount,
-          );
-
-      // Refresh detail after a successful bid.
-      await _fetchListing();
     });
 
     state = state.copyWith(mutation: result);

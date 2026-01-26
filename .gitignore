@@ -24,6 +24,10 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 
+# Firebase CLI / Functions (local)
+.firebase/
+functions/
+
 # Android signing
 **/*.jks
 **/*.keystore

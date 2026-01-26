@@ -1,6 +1,6 @@
 // Riverpod providers live here.
 // Responsibilities:
-// - Provide FirebaseAuth/FirebaseFirestore/FirebaseFunctions instances
+// - Provide FirebaseAuth/FirebaseFirestore instances
 // - Provide repositories
 // - Provide auth state stream provider for router refresh
 // - Provide ViewModel providers per screen
@@ -8,7 +8,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,10 +34,6 @@ final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
 });
 
-final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) {
-  return FirebaseFunctions.instance;
-});
-
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return FirestoreAuthRepository(auth: ref.watch(firebaseAuthProvider));
 });
@@ -63,7 +58,8 @@ final listingRepositoryProvider = Provider<ListingRepository>((ref) {
 
 final bidRepositoryProvider = Provider<BidRepository>((ref) {
   return FirestoreBidRepository(
-    functions: ref.watch(firebaseFunctionsProvider),
+    firestore: ref.watch(firebaseFirestoreProvider),
+    auth: ref.watch(firebaseAuthProvider),
   );
 });
 
