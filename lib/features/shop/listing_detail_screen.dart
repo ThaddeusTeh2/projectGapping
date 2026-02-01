@@ -80,6 +80,7 @@ class ListingDetailScreen extends ConsumerWidget {
                 '${listing.brandLabel} · ${listing.category} · ${listing.displacementBucket}',
               ),
               const SizedBox(height: 12),
+              _kv('Seller', listing.sellerId),
               _kv('Status', listing.isClosed ? 'CLOSED' : 'OPEN'),
               _kv('Starting', listing.startingBid.toStringAsFixed(0)),
               _kv(

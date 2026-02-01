@@ -165,8 +165,38 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isSignedIn();
 
-      // Keep vote counters demo-simple for now.
-      allow update: if true;
+      // Voting: one vote doc per user per comment.
+      match /votes/{userId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.direction in ['up', 'down']
+          && request.resource.data.dateCreatedMillis is int
+          && hasOnlyKeys(['userId', 'direction', 'dateCreatedMillis']);
+
+        // Immutable vote docs.
+        allow update, delete: if false;
+      }
+
+      // Only allow authenticated users to increment vote counters by +1, and
+      // only if they have not already created a vote doc for this comment.
+      allow update: if isSignedIn()
+        && !exists(/databases/$(database)/documents/comments/$(commentId)/votes/$(request.auth.uid))
+        && (
+          (
+            request.writeFields.hasOnly(['upvoteCount'])
+            && request.resource.data.upvoteCount is int
+            && resource.data.upvoteCount is int
+            && request.resource.data.upvoteCount == resource.data.upvoteCount + 1
+          )
+          ||
+          (
+            request.writeFields.hasOnly(['downvoteCount'])
+            && request.resource.data.downvoteCount is int
+            && resource.data.downvoteCount is int
+            && request.resource.data.downvoteCount == resource.data.downvoteCount + 1
+          )
+        );
       allow delete: if false;
     }
 

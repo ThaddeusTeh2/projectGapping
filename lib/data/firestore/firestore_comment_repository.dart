@@ -15,6 +15,9 @@ class FirestoreCommentRepository implements CommentRepository {
   CollectionReference<Map<String, dynamic>> get _col =>
       _firestore.collection(FirestorePaths.comments);
 
+    CollectionReference<Map<String, dynamic>> _votesCol(String commentId) =>
+      _col.doc(commentId).collection('votes');
+
   @override
   Stream<List<BikeComment>> watchCommentsForBike(
     String bikeId, {
@@ -63,16 +66,57 @@ class FirestoreCommentRepository implements CommentRepository {
   }
 
   @override
-  Future<void> upvoteComment(String commentId) {
-    return _col.doc(commentId).update(<String, dynamic>{
-      'upvoteCount': FieldValue.increment(1),
-    });
+  Future<void> upvoteComment({required String commentId, required String userId}) {
+    return _vote(commentId: commentId, userId: userId, direction: 'up');
   }
 
   @override
-  Future<void> downvoteComment(String commentId) {
-    return _col.doc(commentId).update(<String, dynamic>{
-      'downvoteCount': FieldValue.increment(1),
-    });
+  Future<void> downvoteComment({required String commentId, required String userId}) {
+    return _vote(commentId: commentId, userId: userId, direction: 'down');
+  }
+
+  Future<void> _vote({
+    required String commentId,
+    required String userId,
+    required String direction, // 'up' | 'down'
+  }) async {
+    if (userId.isEmpty) {
+      throw StateError('You must be signed in to vote.');
+    }
+    if (direction != 'up' && direction != 'down') {
+      throw StateError('Invalid vote direction.');
+    }
+
+    final commentRef = _col.doc(commentId);
+    final voteRef = _votesCol(commentId).doc(userId);
+    final nowMillis = DateTime.now().millisecondsSinceEpoch;
+
+    try {
+      await _firestore.runTransaction((tx) async {
+        final voteSnap = await tx.get(voteRef);
+        if (voteSnap.exists) {
+          throw StateError('You have already voted on this comment.');
+        }
+
+        tx.set(voteRef, <String, dynamic>{
+          'userId': userId,
+          'direction': direction,
+          'dateCreatedMillis': nowMillis,
+        });
+
+        tx.update(commentRef, <String, dynamic>{
+          if (direction == 'up') 'upvoteCount': FieldValue.increment(1),
+          if (direction == 'down') 'downvoteCount': FieldValue.increment(1),
+        });
+      });
+    } on FirebaseException catch (e) {
+      // Make rule failures readable.
+      final msg = e.message;
+      throw StateError(
+        msg == null || msg.isEmpty
+            ? 'Firestore error (${e.code})'
+            : 'Firestore error (${e.code}): $msg',
+      );
+    }
   }
 }

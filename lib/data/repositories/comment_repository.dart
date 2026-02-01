@@ -18,6 +18,6 @@ abstract class CommentRepository {
     required int dateCreatedMillis,
   });
 
-  Future<void> upvoteComment(String commentId);
-  Future<void> downvoteComment(String commentId);
+  Future<void> upvoteComment({required String commentId, required String userId});
+  Future<void> downvoteComment({required String commentId, required String userId});
 }

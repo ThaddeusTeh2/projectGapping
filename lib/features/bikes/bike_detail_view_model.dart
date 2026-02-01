@@ -81,8 +81,10 @@ class BikeDetailViewModel extends AutoDisposeFamilyNotifier<BikeDetailState, Str
     state = state.copyWith(mutation: const AsyncLoading());
 
     final result = await AsyncValue.guard(() async {
-      _requireUid();
-      await ref.read(commentRepositoryProvider).upvoteComment(commentId);
+      final uid = _requireUid();
+      await ref
+          .read(commentRepositoryProvider)
+          .upvoteComment(commentId: commentId, userId: uid);
     });
 
     state = state.copyWith(mutation: result);
@@ -92,8 +94,10 @@ class BikeDetailViewModel extends AutoDisposeFamilyNotifier<BikeDetailState, Str
     state = state.copyWith(mutation: const AsyncLoading());
 
     final result = await AsyncValue.guard(() async {
-      _requireUid();
-      await ref.read(commentRepositoryProvider).downvoteComment(commentId);
+      final uid = _requireUid();
+      await ref
+          .read(commentRepositoryProvider)
+          .downvoteComment(commentId: commentId, userId: uid);
     });
 
     state = state.copyWith(mutation: result);
