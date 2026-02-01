@@ -20,14 +20,14 @@ class BikeDetailScreen extends ConsumerWidget {
     final state = ref.watch(bikeDetailViewModelProvider(bikeId));
     final viewModel = ref.read(bikeDetailViewModelProvider(bikeId).notifier);
 
-    ref.listen(
-      bikeDetailViewModelProvider(bikeId).select((s) => s.mutation),
-      (previous, next) {
-        if (next.hasError && !next.isLoading) {
-          AppSnackbar.showError(context, next.error.toString());
-        }
-      },
-    );
+    ref.listen(bikeDetailViewModelProvider(bikeId).select((s) => s.mutation), (
+      previous,
+      next,
+    ) {
+      if (next.hasError && !next.isLoading) {
+        AppSnackbar.showError(context, next.error.toString());
+      }
+    });
 
     final commentsAsync = ref.watch(bikeCommentsProvider(bikeId));
 
@@ -44,26 +44,52 @@ class BikeDetailScreen extends ConsumerWidget {
 
           return ListView(
             children: [
-              Text(bike.title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text(
-                '${bike.brandLabel} · ${bike.category} · ${bike.displacementCc}cc · ${bike.releaseYear}',
+              ShadCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        bike.title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${bike.brandLabel} · ${bike.category} · ${bike.displacementCc}cc · ${bike.releaseYear}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(bike.desc),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
-              Text(bike.desc),
-              const SizedBox(height: 16),
-              Text(
-                'SEA notes',
-                style: Theme.of(context).textTheme.titleMedium,
+              ShadCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SEA Notes',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      _kvText('Pricing', bike.seaPricingNote),
+                      _kvText('Fuel', bike.seaFuelNote),
+                      _kvText('Parts', bike.seaPartsNote),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 8),
-              Text('Pricing: ${bike.seaPricingNote}'),
-              Text('Fuel: ${bike.seaFuelNote}'),
-              Text('Parts: ${bike.seaPartsNote}'),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
+              const SizedBox(height: 12),
+              ShadCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: double.infinity,
                     child: ShadButton(
                       onPressed: () {
                         showModalBottomSheet<void>(
@@ -76,13 +102,10 @@ class BikeDetailScreen extends ConsumerWidget {
                       child: const Text('Add comment'),
                     ),
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 20),
-              Text(
-                'Comments',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text('Comments', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               commentsAsync.when(
                 data: (comments) {
@@ -103,14 +126,16 @@ class BikeDetailScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     c.commentTitle,
-                                    style:
-                                        Theme.of(context).textTheme.titleSmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleSmall,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'User ID: ${c.userId}',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                   const SizedBox(height: 6),
                                   Text(c.comment),
@@ -130,8 +155,8 @@ class BikeDetailScreen extends ConsumerWidget {
                                       Tooltip(
                                         message: 'Downvote',
                                         child: ShadIconButton.ghost(
-                                          onPressed: () => viewModel
-                                              .downvoteComment(c.id),
+                                          onPressed: () =>
+                                              viewModel.downvoteComment(c.id),
                                           icon: const Icon(Icons.thumb_down),
                                         ),
                                       ),
@@ -163,4 +188,12 @@ class BikeDetailScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget _kvText(String label, String value) {
+  final v = value.trim().isEmpty ? '(none)' : value.trim();
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Text('$label: $v'),
+  );
 }

@@ -34,7 +34,9 @@ class CreateListingState {
     return CreateListingState(
       query: query ?? this.query,
       bikes: bikes ?? this.bikes,
-      selectedBike: clearSelectedBike ? null : (selectedBike ?? this.selectedBike),
+      selectedBike: clearSelectedBike
+          ? null
+          : (selectedBike ?? this.selectedBike),
       mutation: mutation ?? this.mutation,
     );
   }
@@ -42,8 +44,8 @@ class CreateListingState {
 
 final createListingViewModelProvider =
     NotifierProvider.autoDispose<CreateListingViewModel, CreateListingState>(
-  CreateListingViewModel.new,
-);
+      CreateListingViewModel.new,
+    );
 
 class CreateListingViewModel extends AutoDisposeNotifier<CreateListingState> {
   @override
@@ -116,19 +118,25 @@ class CreateListingViewModel extends AutoDisposeNotifier<CreateListingState> {
         category: bike.category,
         displacementBucket: bike.displacementBucket,
         bikeTitle: bike.title,
+        bikeReleaseYear: bike.releaseYear,
         hasBid: false,
         startingBid: startingBid,
         currentBid: null,
         buyOutPrice: buyOutPrice,
         dateCreatedMillis: createdMillis,
-        closingTimeMillis: closingTimeMillisFromPreset(preset, fromMillis: createdMillis),
+        closingTimeMillis: closingTimeMillisFromPreset(
+          preset,
+          fromMillis: createdMillis,
+        ),
         isClosed: false,
         closedAtMillis: null,
         closingBid: null,
         listingComments: listingComments.trim(),
       );
 
-      final listingId = await ref.read(listingRepositoryProvider).createListing(listing);
+      final listingId = await ref
+          .read(listingRepositoryProvider)
+          .createListing(listing);
       return listingId;
     });
 

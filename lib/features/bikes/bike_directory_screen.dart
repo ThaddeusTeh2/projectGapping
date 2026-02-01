@@ -11,11 +11,25 @@ import '../../data/repositories/bike_repository.dart';
 import '../../domain/enums.dart';
 import 'bike_directory_view_model.dart';
 
-class BikeDirectoryScreen extends ConsumerWidget {
+class BikeDirectoryScreen extends ConsumerStatefulWidget {
   const BikeDirectoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BikeDirectoryScreen> createState() =>
+      _BikeDirectoryScreenState();
+}
+
+class _BikeDirectoryScreenState extends ConsumerState<BikeDirectoryScreen> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(bikeDirectoryViewModelProvider);
     final viewModel = ref.read(bikeDirectoryViewModelProvider.notifier);
 
@@ -89,76 +103,112 @@ class BikeDirectoryScreen extends ConsumerWidget {
         CanonicalBrands.labelForKey(state.brandKey) ?? 'Any brand';
     final activeCategoryLabel = state.category?.label ?? 'Any category';
     final activeBucketLabel = state.displacementBucket?.label ?? 'Any cc';
+    final canClear =
+        state.brandKey != null ||
+        state.category != null ||
+        state.displacementBucket != null ||
+        state.query.trim().isNotEmpty;
 
     return AppScaffold(
       title: 'Bikes',
       body: Column(
         children: [
+          ShadInputFormField(
+            controller: _searchController,
+            label: const Text('Search'),
+            placeholder: const Text(
+              'Brand, category, cc bucket, title, or release year…',
+            ),
+            onChanged: viewModel.setQuery,
+          ),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            child: _AccordionCard(
+              title: 'Filters',
               children: [
-                ActionChip(
-                  label: Text(activeBrandLabel),
-                  onPressed: () async {
-                    final selected = await pickBrand();
-                    await viewModel.setBrandKey(selected);
-                  },
-                ),
-                ActionChip(
-                  label: Text(activeCategoryLabel),
-                  onPressed: () async {
-                    final selected = await pickCategory();
-                    await viewModel.setCategory(selected);
-                  },
-                ),
-                ActionChip(
-                  label: Text(activeBucketLabel),
-                  onPressed: () async {
-                    final selected = await pickBucket();
-                    await viewModel.setDisplacementBucket(selected);
-                  },
-                ),
-                PopupMenuButton<BikeSort>(
-                  tooltip: 'Sort',
-                  onSelected: viewModel.setSort,
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(
-                      value: BikeSort.titleAsc,
-                      child: Text('Title (A–Z)'),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: () async {
+                        final selected = await pickBrand();
+                        await viewModel.setBrandKey(selected);
+                      },
+                      child: Text(activeBrandLabel),
                     ),
-                    PopupMenuItem(
-                      value: BikeSort.dateCreatedDesc,
-                      child: Text('Newest'),
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: () async {
+                        final selected = await pickCategory();
+                        await viewModel.setCategory(selected);
+                      },
+                      child: Text(activeCategoryLabel),
                     ),
-                    PopupMenuItem(
-                      value: BikeSort.releaseYearDesc,
-                      child: Text('Release year'),
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: () async {
+                        final selected = await pickBucket();
+                        await viewModel.setDisplacementBucket(selected);
+                      },
+                      child: Text(activeBucketLabel),
+                    ),
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: canClear
+                          ? () {
+                              _searchController.clear();
+                              viewModel.clearAll();
+                            }
+                          : null,
+                      child: const Text('Clear'),
                     ),
                   ],
-                  child: const Chip(label: Text('Sort')),
-                ),
-                ShadButton.ghost(
-                  size: ShadButtonSize.sm,
-                  onPressed:
-                      (state.brandKey != null ||
-                              state.category != null ||
-                              state.displacementBucket != null)
-                          ? viewModel.clearFilters
-                          : null,
-                  child: const Text('Clear'),
                 ),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              'Note: to avoid Firestore composite-index combinatorics, the app fetches a broad set and filters/sorts locally for demo-scale data.',
-              style: Theme.of(context).textTheme.bodySmall,
+            child: _AccordionCard(
+              title: 'Sort',
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: state.sort == BikeSort.titleAsc
+                          ? null
+                          : () => viewModel.setSort(BikeSort.titleAsc),
+                      child: Text(
+                        '${state.sort == BikeSort.titleAsc ? '✓ ' : ''}Title',
+                      ),
+                    ),
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: state.sort == BikeSort.dateCreatedDesc
+                          ? null
+                          : () => viewModel.setSort(BikeSort.dateCreatedDesc),
+                      child: Text(
+                        '${state.sort == BikeSort.dateCreatedDesc ? '✓ ' : ''}Newest',
+                      ),
+                    ),
+                    ShadButton.ghost(
+                      size: ShadButtonSize.sm,
+                      onPressed: state.sort == BikeSort.releaseYearDesc
+                          ? null
+                          : () => viewModel.setSort(BikeSort.releaseYearDesc),
+                      child: Text(
+                        '${state.sort == BikeSort.releaseYearDesc ? '✓ ' : ''}Year',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -196,6 +246,24 @@ class BikeDirectoryScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AccordionCard extends StatelessWidget {
+  const _AccordionCard({required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadCard(
+      child: ExpansionTile(
+        title: Text(title),
+        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        children: children,
       ),
     );
   }

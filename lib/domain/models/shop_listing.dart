@@ -2,6 +2,7 @@
 // Firestore: listings/{listingId}
 // Bid-only listing.
 // Fields: bikeId, sellerId, brandKey, brandLabel, category, displacementBucket, bikeTitle,
+// bikeReleaseYear?,
 // hasBid, startingBid, currentBid?, currentBidderId?, buyOutPrice,
 // dateCreatedMillis, closingTimeMillis,
 // isClosed, closedAtMillis?, closingBid?, winnerUserId?, listingComments
@@ -17,6 +18,7 @@ class ShopListing {
     required this.category,
     required this.displacementBucket,
     required this.bikeTitle,
+    this.bikeReleaseYear,
     required this.hasBid,
     required this.startingBid,
     required this.currentBid,
@@ -39,6 +41,7 @@ class ShopListing {
   final String category;
   final String displacementBucket;
   final String bikeTitle;
+  final int? bikeReleaseYear;
   final bool hasBid;
   final double startingBid;
   final double? currentBid;
@@ -77,6 +80,7 @@ class ShopListing {
     if (closedAtMillis != null) data['closedAtMillis'] = closedAtMillis;
     if (closingBid != null) data['closingBid'] = closingBid;
     if (winnerUserId != null) data['winnerUserId'] = winnerUserId;
+    if (bikeReleaseYear != null) data['bikeReleaseYear'] = bikeReleaseYear;
 
     return data;
   }
@@ -94,6 +98,7 @@ class ShopListing {
       category: _readString(data, 'category'),
       displacementBucket: _readString(data, 'displacementBucket'),
       bikeTitle: _readString(data, 'bikeTitle'),
+      bikeReleaseYear: _readIntNullable(data['bikeReleaseYear']),
       hasBid: _readBoolOrDefault(data['hasBid'], defaultValue: false),
       startingBid: _readDouble(data, 'startingBid'),
       currentBid: _readDoubleNullable(data['currentBid']),

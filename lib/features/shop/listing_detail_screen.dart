@@ -89,101 +89,139 @@ class ListingDetailScreen extends ConsumerWidget {
                 '${listing.brandLabel} · ${listing.category} · ${listing.displacementBucket}',
               ),
               const SizedBox(height: 12),
-              _kv('Seller', listing.sellerId),
-              _kv('Status', listing.isClosed ? 'CLOSED' : 'OPEN'),
-              _kv('Starting', listing.startingBid.toStringAsFixed(0)),
-              _kv(
-                'Current',
-                listing.currentBid == null
-                    ? 'No bids yet'
-                    : listing.currentBid!.toStringAsFixed(0),
+              _SectionCard(
+                title: 'People',
+                separated: true,
+                children: [
+                  _kv(context, 'Seller', listing.sellerId),
+                  if (!listing.isClosed && listing.currentBidderId != null)
+                    _kv(context, 'Leader', listing.currentBidderId!),
+                  if (listing.isClosed && winnerId != null)
+                    _kv(context, 'Winner', winnerId),
+                ],
               ),
-              if (!listing.isClosed && listing.currentBidderId != null)
-                _kv('Leader', listing.currentBidderId!),
-              _kv('Buyout', listing.buyOutPrice.toStringAsFixed(0)),
-              _kv('Closes in', closesIn),
-              _kv('Closes at', closesAt.toLocal().toString()),
-              if (listing.isClosed && winnerId != null) _kv('Winner', winnerId),
-              if (listing.isClosed && finalPrice != null)
-                _kv('Final', finalPrice.toStringAsFixed(0)),
-              const SizedBox(height: 16),
-              Text(
-                'Seller Notes',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                listing.listingComments.isEmpty
-                    ? '(none)'
-                    : listing.listingComments,
-              ),
-              const SizedBox(height: 20),
-              if (canBuyout) ...[
-                Text('Buyout', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ShadButton(
-                    onPressed: state.mutation.isLoading
-                        ? null
-                        : () async {
-                            if (currentUser?.uid == null) {
-                              AppSnackbar.showError(
-                                context,
-                                'You must be signed in to buy out.',
-                              );
-                              return;
-                            }
-                            final ok = await viewModel.buyoutListing();
-                            if (!context.mounted) return;
-                            if (ok) {
-                              AppSnackbar.showSuccess(
-                                context,
-                                'Listing bought out',
-                              );
-                            }
-                          },
-                    leading: const Icon(Icons.shopping_cart_checkout),
-                    child: Text(
-                      'Buyout for ${listing.buyOutPrice.toStringAsFixed(0)}',
-                    ),
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: 'Pricing',
+                separated: true,
+                children: [
+                  _kv(
+                    context,
+                    'Starting',
+                    listing.startingBid.toStringAsFixed(0),
                   ),
+                  _kv(
+                    context,
+                    listing.isClosed ? 'Final' : 'Current',
+                    listing.currentBid == null
+                        ? 'No bids yet'
+                        : (listing.isClosed && finalPrice != null
+                              ? finalPrice.toStringAsFixed(0)
+                              : listing.currentBid!.toStringAsFixed(0)),
+                  ),
+                  _kv(
+                    context,
+                    'Buyout',
+                    listing.buyOutPrice.toStringAsFixed(0),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: 'Timing',
+                separated: true,
+                children: [
+                  _kv(context, 'Status', listing.isClosed ? 'CLOSED' : 'OPEN'),
+                  _kv(context, 'Closes in', closesIn),
+                  _kv(context, 'Closes at', closesAt.toLocal().toString()),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: 'Seller Notes',
+                children: [
+                  Text(
+                    listing.listingComments.isEmpty
+                        ? '(none)'
+                        : listing.listingComments,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (canBuyout)
+                _SectionCard(
+                  title: 'Buyout',
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ShadButton(
+                        onPressed: state.mutation.isLoading
+                            ? null
+                            : () async {
+                                if (currentUser?.uid == null) {
+                                  AppSnackbar.showError(
+                                    context,
+                                    'You must be signed in to buy out.',
+                                  );
+                                  return;
+                                }
+                                final ok = await viewModel.buyoutListing();
+                                if (!context.mounted) return;
+                                if (ok) {
+                                  AppSnackbar.showSuccess(
+                                    context,
+                                    'Listing bought out',
+                                  );
+                                }
+                              },
+                        leading: const Icon(Icons.shopping_cart_checkout),
+                        child: Text(
+                          'Buyout for ${listing.buyOutPrice.toStringAsFixed(0)}',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-              ],
-              _BidSection(
-                listingId: listing.id,
-                currentBid: listing.currentBid,
-                startingBid: listing.startingBid,
-                enabled: biddingOpen && !state.mutation.isLoading,
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: 'Bid',
+                children: [
+                  _BidSection(
+                    listingId: listing.id,
+                    currentBid: listing.currentBid,
+                    startingBid: listing.startingBid,
+                    enabled: biddingOpen && !state.mutation.isLoading,
+                  ),
+                ],
               ),
               if (isOwner) ...[
-                const SizedBox(height: 20),
-                Text(
-                  'Seller Controls',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ShadButton(
-                    onPressed: state.mutation.isLoading
-                        ? null
-                        : () async {
-                            final ok = await viewModel.closeListingEarly();
-                            if (!context.mounted) return;
-                            if (ok) {
-                              AppSnackbar.showSuccess(
-                                context,
-                                'Listing closed',
-                              );
-                            }
-                          },
-                    leading: const Icon(Icons.lock_outline),
-                    child: const Text('Close Listing Early'),
-                  ),
+                const SizedBox(height: 12),
+                _SectionCard(
+                  title: 'Seller Controls',
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ShadButton(
+                        onPressed: state.mutation.isLoading
+                            ? null
+                            : () async {
+                                final ok = await viewModel.closeListingEarly();
+                                if (!context.mounted) return;
+                                if (ok) {
+                                  AppSnackbar.showSuccess(
+                                    context,
+                                    'Listing closed',
+                                  );
+                                }
+                              },
+                        leading: const Icon(Icons.lock_outline),
+                        child: const Text('Close Listing Early'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
+              const SizedBox(height: 12),
             ],
           );
         },
@@ -192,6 +230,40 @@ class ListingDetailScreen extends ConsumerWidget {
           onRetry: viewModel.retry,
         ),
         loading: () => const LoadingView(message: 'Loading listing…'),
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.children,
+    this.separated = false,
+  });
+
+  final String title;
+  final List<Widget> children;
+  final bool separated;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadCard(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            if (!separated) ...children,
+            if (separated)
+              for (var i = 0; i < children.length; i++) ...[
+                children[i],
+                if (i != children.length - 1) const Divider(height: 16),
+              ],
+          ],
+        ),
       ),
     );
   }
@@ -287,15 +359,14 @@ class _BidSectionState extends ConsumerState<_BidSection> {
   }
 }
 
-Widget _kv(String k, String v) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(width: 90, child: Text('$k:')),
-        Expanded(child: Text(v)),
-      ],
-    ),
+Widget _kv(BuildContext context, String label, String value) {
+  final theme = Theme.of(context);
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: theme.textTheme.labelMedium),
+      const SizedBox(height: 2),
+      Text(value),
+    ],
   );
 }

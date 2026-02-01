@@ -36,6 +36,7 @@ service cloud.firestore {
         && request.resource.data.closingTimeMillis is int
         && isNumber(request.resource.data.buyOutPrice)
         && request.resource.data.dateCreatedMillis is int
+        && (!('bikeReleaseYear' in request.resource.data) || request.resource.data.bikeReleaseYear is int)
         // Prefer `currentBid` absent on create; if present it must be null.
         && (!('currentBid' in request.resource.data) || request.resource.data.currentBid == null)
         && (!('currentBidderId' in request.resource.data) || request.resource.data.currentBidderId == null)
@@ -88,6 +89,7 @@ service cloud.firestore {
             && request.resource.data.category == resource.data.category
             && request.resource.data.displacementBucket == resource.data.displacementBucket
             && request.resource.data.bikeTitle == resource.data.bikeTitle
+            && request.resource.data.bikeReleaseYear == resource.data.bikeReleaseYear
           )
         );
 

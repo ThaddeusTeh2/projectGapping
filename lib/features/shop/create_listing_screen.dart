@@ -17,7 +17,8 @@ class CreateListingScreen extends ConsumerStatefulWidget {
   const CreateListingScreen({super.key});
 
   @override
-  ConsumerState<CreateListingScreen> createState() => _CreateListingScreenState();
+  ConsumerState<CreateListingScreen> createState() =>
+      _CreateListingScreenState();
 }
 
 class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
@@ -45,14 +46,14 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     final state = ref.watch(createListingViewModelProvider);
     final viewModel = ref.read(createListingViewModelProvider.notifier);
 
-    ref.listen(
-      createListingViewModelProvider.select((s) => s.mutation),
-      (previous, next) {
-        if (next.hasError && !next.isLoading) {
-          AppSnackbar.showError(context, next.error.toString());
-        }
-      },
-    );
+    ref.listen(createListingViewModelProvider.select((s) => s.mutation), (
+      previous,
+      next,
+    ) {
+      if (next.hasError && !next.isLoading) {
+        AppSnackbar.showError(context, next.error.toString());
+      }
+    });
 
     final isSubmitting = state.mutation.isLoading;
     final startingBid = double.tryParse(_startingBidController.text.trim());
@@ -75,64 +76,19 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
-          ShadInputFormField(
-            controller: _searchController,
-            enabled: !isSubmitting,
-            label: const Text('Search'),
-            placeholder: const Text('Type a model name…'),
-            onChanged: viewModel.setQuery,
-          ),
-          const SizedBox(height: 12),
-          _SelectedBikeCard(
-            bike: state.selectedBike,
-            onClear: isSubmitting ? null : viewModel.clearSelection,
-          ),
-          const SizedBox(height: 12),
           state.bikes.when(
             data: (bikes) {
-              final query = state.query.trim().toLowerCase();
-              final filtered = query.isEmpty
-                  ? bikes
-                  : bikes
-                      .where(
-                        (b) =>
-                            b.titleLower.contains(query) ||
-                            b.brandLabel.toLowerCase().contains(query),
-                      )
-                      .toList(growable: false);
-
-              final visible = filtered.take(25).toList(growable: false);
-
-              if (visible.isEmpty) {
-                return const EmptyStateView(message: 'No bikes match your search.');
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Pick from bikes list',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 8),
-                  for (final bike in visible)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: ShadCard(
-                        child: ListTile(
-                          title: Text(bike.title),
-                          subtitle: Text(
-                            '${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}',
-                          ),
-                          trailing: state.selectedBike?.id == bike.id
-                              ? const Icon(Icons.check)
-                              : null,
-                          onTap:
-                              isSubmitting ? null : () => viewModel.selectBike(bike),
-                        ),
-                      ),
-                    ),
-                ],
+              return _SelectedBikeCard(
+                bike: state.selectedBike,
+                enabled: !isSubmitting,
+                onPick: () async {
+                  final selected = await _showBikePicker(bikes: bikes);
+                  if (!context.mounted) return;
+                  if (selected != null) {
+                    viewModel.selectBike(selected);
+                  }
+                },
+                onClear: isSubmitting ? null : viewModel.clearSelection,
               );
             },
             error: (error, _) => ErrorStateView(
@@ -154,7 +110,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 ShadInputFormField(
                   controller: _startingBidController,
                   enabled: !isSubmitting,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   label: const Text('Starting Bid (MYR)'),
                   validator: Validators.listingStartingBid,
                 ),
@@ -162,7 +120,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                 ShadInputFormField(
                   controller: _buyoutController,
                   enabled: !isSubmitting,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   label: const Text('Buyout Price (MYR)'),
                   validator: (v) => Validators.listingBuyoutPrice(
                     buyoutValue: v,
@@ -190,19 +150,30 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                     onPressed: isSubmitting
                         ? null
                         : () async {
-                            final isValid = _formKey.currentState?.validate() ?? false;
+                            final isValid =
+                                _formKey.currentState?.validate() ?? false;
                             if (!isValid) return;
                             if (state.selectedBike == null) {
-                              AppSnackbar.showError(context, 'Select a bike model first.');
+                              AppSnackbar.showError(
+                                context,
+                                'Select a bike model first.',
+                              );
                               return;
                             }
                             if (_preset == null) {
-                              AppSnackbar.showError(context, 'Closing preset required.');
+                              AppSnackbar.showError(
+                                context,
+                                'Closing preset required.',
+                              );
                               return;
                             }
 
-                            final start = double.parse(_startingBidController.text.trim());
-                            final buyout = double.parse(_buyoutController.text.trim());
+                            final start = double.parse(
+                              _startingBidController.text.trim(),
+                            );
+                            final buyout = double.parse(
+                              _buyoutController.text.trim(),
+                            );
 
                             final listingId = await viewModel.publishListing(
                               startingBid: start,
@@ -213,7 +184,9 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
 
                             if (!context.mounted) return;
                             if (listingId == null) {
-                              final mutation = ref.read(createListingViewModelProvider).mutation;
+                              final mutation = ref
+                                  .read(createListingViewModelProvider)
+                                  .mutation;
                               final err = mutation.error;
                               if (err != null) {
                                 AppSnackbar.showError(context, err.toString());
@@ -221,11 +194,16 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                               return;
                             }
 
-                            AppSnackbar.showSuccess(context, 'Listing published');
+                            AppSnackbar.showSuccess(
+                              context,
+                              'Listing published',
+                            );
                             context.go('/listing/$listingId');
                           },
                     leading: const Icon(Icons.publish),
-                    child: Text(isSubmitting ? 'Publishing…' : 'Publish Listing'),
+                    child: Text(
+                      isSubmitting ? 'Publishing…' : 'Publish Listing',
+                    ),
                   ),
                 ),
               ],
@@ -235,34 +213,135 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
       ),
     );
   }
+
+  Future<Bike?> _showBikePicker({required List<Bike> bikes}) async {
+    _searchController.clear();
+    return showModalBottomSheet<Bike?>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) {
+        var query = '';
+        final selectedId = ref
+            .read(createListingViewModelProvider)
+            .selectedBike
+            ?.id;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final q = query.trim().toLowerCase();
+            final filtered = q.isEmpty
+                ? bikes
+                : bikes
+                      .where(
+                        (b) =>
+                            b.titleLower.contains(q) ||
+                            b.brandLabel.toLowerCase().contains(q),
+                      )
+                      .toList(growable: false);
+
+            final visible = filtered.take(50).toList(growable: false);
+
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  top: 12,
+                ),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Choose a bike',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      ShadInputFormField(
+                        controller: _searchController,
+                        label: const Text('Search'),
+                        placeholder: const Text('Type a model name…'),
+                        onChanged: (v) => setModalState(() => query = v),
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: visible.isEmpty
+                            ? const EmptyStateView(
+                                message: 'No bikes match your search.',
+                              )
+                            : ListView.separated(
+                                itemCount: visible.length,
+                                separatorBuilder: (_, __) =>
+                                    const Divider(height: 1),
+                                itemBuilder: (context, i) {
+                                  final bike = visible[i];
+                                  final isSelected = bike.id == selectedId;
+                                  return ListTile(
+                                    title: Text(bike.title),
+                                    subtitle: Text(
+                                      '${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}',
+                                    ),
+                                    trailing: isSelected
+                                        ? const Icon(Icons.check)
+                                        : const Icon(Icons.chevron_right),
+                                    onTap: () => Navigator.pop(context, bike),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 class _SelectedBikeCard extends StatelessWidget {
-  const _SelectedBikeCard({required this.bike, required this.onClear});
+  const _SelectedBikeCard({
+    required this.bike,
+    required this.enabled,
+    required this.onPick,
+    required this.onClear,
+  });
 
   final Bike? bike;
+  final bool enabled;
+  final VoidCallback onPick;
   final VoidCallback? onClear;
 
   @override
   Widget build(BuildContext context) {
-    if (bike == null) {
-      return const EmptyStateView(
-        message: 'No bike selected. Search and pick one below.',
-        icon: Icons.motorcycle,
-      );
-    }
-
     return ShadCard(
       child: ListTile(
-        title: Text(bike!.title),
-        subtitle: Text('${bike!.brandLabel} · ${bike!.category} · ${bike!.displacementBucket}'),
-        trailing: Tooltip(
-          message: 'Clear selection',
-          child: ShadIconButton.ghost(
-            onPressed: onClear,
-            icon: const Icon(Icons.close),
-          ),
+        title: Text(bike?.title ?? 'Select a bike'),
+        subtitle: bike == null
+            ? const Text('Tap to search and pick a model')
+            : Text(
+                '${bike!.brandLabel} · ${bike!.category} · ${bike!.displacementBucket}',
+              ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (bike != null)
+              Tooltip(
+                message: 'Clear selection',
+                child: ShadIconButton.ghost(
+                  onPressed: onClear,
+                  icon: const Icon(Icons.close),
+                ),
+              ),
+            const Icon(Icons.unfold_more),
+          ],
         ),
+        onTap: enabled ? onPick : null,
       ),
     );
   }

@@ -16,22 +16,32 @@ class ShopDirectoryState {
     required this.brandKey,
     required this.category,
     required this.displacementBucket,
-    required this.listings,
+    required this.query,
+    required this.sort,
+    required this.openListings,
+    required this.closedListings,
   });
 
   final String? brandKey;
   final BikeCategory? category;
   final DisplacementBucket? displacementBucket;
-  final AsyncValue<List<ShopListing>> listings;
+  final String query;
+  final ShopSort sort;
+  final AsyncValue<List<ShopListing>> openListings;
+  final AsyncValue<List<ShopListing>> closedListings;
 
   ShopDirectoryState copyWith({
     String? brandKey,
     BikeCategory? category,
     DisplacementBucket? displacementBucket,
-    AsyncValue<List<ShopListing>>? listings,
+    String? query,
+    ShopSort? sort,
+    AsyncValue<List<ShopListing>>? openListings,
+    AsyncValue<List<ShopListing>>? closedListings,
     bool clearBrandKey = false,
     bool clearCategory = false,
     bool clearDisplacementBucket = false,
+    bool clearQuery = false,
   }) {
     return ShopDirectoryState(
       brandKey: clearBrandKey ? null : (brandKey ?? this.brandKey),
@@ -39,10 +49,15 @@ class ShopDirectoryState {
       displacementBucket: clearDisplacementBucket
           ? null
           : (displacementBucket ?? this.displacementBucket),
-      listings: listings ?? this.listings,
+      query: clearQuery ? '' : (query ?? this.query),
+      sort: sort ?? this.sort,
+      openListings: openListings ?? this.openListings,
+      closedListings: closedListings ?? this.closedListings,
     );
   }
 }
+
+enum ShopSort { newest, closingSoon }
 
 final shopDirectoryViewModelProvider =
     NotifierProvider.autoDispose<ShopDirectoryViewModel, ShopDirectoryState>(
@@ -50,13 +65,20 @@ final shopDirectoryViewModelProvider =
     );
 
 class ShopDirectoryViewModel extends AutoDisposeNotifier<ShopDirectoryState> {
+  List<ShopListing> _openAll = const [];
+  List<ShopListing> _closedAll = const [];
+  bool _hasFetched = false;
+
   @override
   ShopDirectoryState build() {
     state = const ShopDirectoryState(
       brandKey: null,
       category: null,
       displacementBucket: null,
-      listings: AsyncLoading(),
+      query: '',
+      sort: ShopSort.newest,
+      openListings: AsyncLoading(),
+      closedListings: AsyncLoading(),
     );
 
     Future.microtask(_fetch);
@@ -64,64 +86,148 @@ class ShopDirectoryViewModel extends AutoDisposeNotifier<ShopDirectoryState> {
   }
 
   Future<void> _fetch() async {
-    state = state.copyWith(listings: const AsyncLoading());
+    state = state.copyWith(
+      openListings: const AsyncLoading(),
+      closedListings: const AsyncLoading(),
+    );
 
     final repo = ref.read(listingRepositoryProvider);
 
-    final result = await AsyncValue.guard(() async {
-      // Firestore strategy (SSOT footnote): fetch broad, then filter/sort locally.
-      final fetched = await repo.listListings(limit: 500);
-
-      Iterable<ShopListing> filtered = fetched;
-
-      // Default behavior from SSOT: show open listings by default.
-      final now = nowMillis();
-      filtered = filtered.where(
-        (l) => !l.isClosed && now < l.closingTimeMillis,
-      );
-
-      final selectedBrandKey = state.brandKey;
-      final selectedCategory = state.category;
-      final selectedBucket = state.displacementBucket;
-
-      if (selectedBrandKey != null) {
-        filtered = filtered.where((l) => l.brandKey == selectedBrandKey);
-      }
-      if (selectedCategory != null) {
-        filtered = filtered.where((l) => l.category == selectedCategory.label);
-      }
-      if (selectedBucket != null) {
-        filtered = filtered.where(
-          (l) => l.displacementBucket == selectedBucket.key,
-        );
-      }
-
-      final list = filtered.toList(growable: false);
-
-      final sorted = List<ShopListing>.of(list)
-        ..sort((a, b) => b.dateCreatedMillis.compareTo(a.dateCreatedMillis));
-
-      return sorted;
+    final openResult = await AsyncValue.guard(() async {
+      final fetched = await repo.listListings(isClosed: false, limit: 500);
+      _openAll = fetched;
+      return fetched;
     });
 
-    state = state.copyWith(listings: result);
+    final closedResult = await AsyncValue.guard(() async {
+      final fetched = await repo.listListings(isClosed: true, limit: 500);
+      _closedAll = fetched;
+      return fetched;
+    });
+
+    if (openResult.hasError) {
+      state = state.copyWith(openListings: openResult);
+      return;
+    }
+    if (closedResult.hasError) {
+      state = state.copyWith(closedListings: closedResult);
+      return;
+    }
+
+    _hasFetched = true;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    if (!_hasFetched) return;
+
+    final selectedBrandKey = state.brandKey;
+    final selectedCategory = state.category;
+    final selectedBucket = state.displacementBucket;
+    final query = state.query.trim().toLowerCase();
+    final now = nowMillis();
+
+    bool matchesQuery(ShopListing l) {
+      if (query.isEmpty) return true;
+      final bucketLabel =
+          DisplacementBucket.tryParseKey(l.displacementBucket)?.label ??
+          l.displacementBucket;
+      return l.bikeTitle.toLowerCase().contains(query) ||
+          l.brandLabel.toLowerCase().contains(query) ||
+          l.category.toLowerCase().contains(query) ||
+          l.displacementBucket.toLowerCase().contains(query) ||
+          bucketLabel.toLowerCase().contains(query) ||
+          (l.bikeReleaseYear?.toString().contains(query) ?? false);
+    }
+
+    Iterable<ShopListing> openFiltered = _openAll;
+    openFiltered = openFiltered.where((l) => now < l.closingTimeMillis);
+
+    if (selectedBrandKey != null) {
+      openFiltered = openFiltered.where((l) => l.brandKey == selectedBrandKey);
+    }
+    if (selectedCategory != null) {
+      openFiltered = openFiltered.where(
+        (l) => l.category == selectedCategory.label,
+      );
+    }
+    if (selectedBucket != null) {
+      openFiltered = openFiltered.where(
+        (l) => l.displacementBucket == selectedBucket.key,
+      );
+    }
+    openFiltered = openFiltered.where(matchesQuery);
+
+    final openList = openFiltered.toList(growable: false);
+    final openSorted = List<ShopListing>.of(openList);
+    switch (state.sort) {
+      case ShopSort.newest:
+        openSorted.sort(
+          (a, b) => b.dateCreatedMillis.compareTo(a.dateCreatedMillis),
+        );
+      case ShopSort.closingSoon:
+        openSorted.sort(
+          (a, b) => a.closingTimeMillis.compareTo(b.closingTimeMillis),
+        );
+    }
+
+    Iterable<ShopListing> closedFiltered = _closedAll;
+    if (selectedBrandKey != null) {
+      closedFiltered = closedFiltered.where(
+        (l) => l.brandKey == selectedBrandKey,
+      );
+    }
+    if (selectedCategory != null) {
+      closedFiltered = closedFiltered.where(
+        (l) => l.category == selectedCategory.label,
+      );
+    }
+    if (selectedBucket != null) {
+      closedFiltered = closedFiltered.where(
+        (l) => l.displacementBucket == selectedBucket.key,
+      );
+    }
+    closedFiltered = closedFiltered.where(matchesQuery);
+
+    final closedList = closedFiltered.toList(growable: false);
+    final closedSorted = List<ShopListing>.of(closedList)
+      ..sort((a, b) {
+        final aClosed = a.closedAtMillis ?? a.dateCreatedMillis;
+        final bClosed = b.closedAtMillis ?? b.dateCreatedMillis;
+        return bClosed.compareTo(aClosed);
+      });
+
+    state = state.copyWith(
+      openListings: AsyncData(openSorted),
+      closedListings: AsyncData(closedSorted),
+    );
   }
 
   Future<void> retry() => _fetch();
 
   Future<void> setBrandKey(String? brandKey) async {
     state = state.copyWith(brandKey: brandKey);
-    await _fetch();
+    _applyFilters();
   }
 
   Future<void> setCategory(BikeCategory? category) async {
     state = state.copyWith(category: category);
-    await _fetch();
+    _applyFilters();
   }
 
   Future<void> setDisplacementBucket(DisplacementBucket? bucket) async {
     state = state.copyWith(displacementBucket: bucket);
-    await _fetch();
+    _applyFilters();
+  }
+
+  void setQuery(String query) {
+    state = state.copyWith(query: query);
+    _applyFilters();
+  }
+
+  void setSort(ShopSort sort) {
+    state = state.copyWith(sort: sort);
+    _applyFilters();
   }
 
   Future<void> clearFilters() async {
@@ -130,6 +236,16 @@ class ShopDirectoryViewModel extends AutoDisposeNotifier<ShopDirectoryState> {
       clearCategory: true,
       clearDisplacementBucket: true,
     );
-    await _fetch();
+    _applyFilters();
+  }
+
+  void clearAll() {
+    state = state.copyWith(
+      clearBrandKey: true,
+      clearCategory: true,
+      clearDisplacementBucket: true,
+      clearQuery: true,
+    );
+    _applyFilters();
   }
 }
