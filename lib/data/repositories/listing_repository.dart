@@ -20,5 +20,14 @@ abstract class ListingRepository {
     required String listingId,
     required int closedAtMillis,
     double? closingBid,
+    String? winnerUserId,
   });
+
+  Future<void> buyoutListing({
+    required String listingId,
+    required String buyerId,
+    required int boughtAtMillis,
+  });
+
+  Future<void> autoCloseExpiredListing({required String listingId});
 }

@@ -40,7 +40,8 @@ service cloud.firestore {
         && (!('currentBid' in request.resource.data) || request.resource.data.currentBid == null)
         && (!('currentBidderId' in request.resource.data) || request.resource.data.currentBidderId == null)
         && (!('closedAtMillis' in request.resource.data) || request.resource.data.closedAtMillis == null)
-        && (!('closingBid' in request.resource.data) || request.resource.data.closingBid == null);
+        && (!('closingBid' in request.resource.data) || request.resource.data.closingBid == null)
+        && (!('winnerUserId' in request.resource.data) || request.resource.data.winnerUserId == null);
 
       // Seller can update/close listing. Keep this permissive but field-constrained.
       allow update: if isOwner(resource.data.sellerId)
@@ -51,8 +52,24 @@ service cloud.firestore {
             // Treat missing isClosed as "not closed" for older docs.
             && resource.data.isClosed != true
             && request.resource.data.closedAtMillis is int
-            // closingBid can be absent/null if no bids.
-            && (!('closingBid' in request.resource.data) || request.resource.data.closingBid == null || isNumber(request.resource.data.closingBid))
+            && (
+              (
+                // Closing with bids: must set closingBid + winnerUserId.
+                resource.data.hasBid == true
+                && request.writeFields.hasOnly(['isClosed', 'closedAtMillis', 'closingBid', 'winnerUserId'])
+                && isNumber(resource.data.currentBid)
+                && isNumber(request.resource.data.closingBid)
+                && request.resource.data.closingBid == resource.data.currentBid
+                && request.resource.data.winnerUserId is string
+                && request.resource.data.winnerUserId == resource.data.currentBidderId
+              )
+              ||
+              (
+                // Closing with no bids.
+                resource.data.hasBid != true
+                && request.writeFields.hasOnly(['isClosed', 'closedAtMillis'])
+              )
+            )
           )
           ||
           // Seller non-bid edits (notes only) while open.
@@ -64,12 +81,63 @@ service cloud.firestore {
             && request.resource.data.closingTimeMillis == resource.data.closingTimeMillis
             && request.resource.data.startingBid == resource.data.startingBid
             && request.resource.data.buyOutPrice == resource.data.buyOutPrice
+            && request.resource.data.winnerUserId == resource.data.winnerUserId
             && request.resource.data.bikeId == resource.data.bikeId
             && request.resource.data.brandKey == resource.data.brandKey
             && request.resource.data.brandLabel == resource.data.brandLabel
             && request.resource.data.category == resource.data.category
             && request.resource.data.displacementBucket == resource.data.displacementBucket
             && request.resource.data.bikeTitle == resource.data.bikeTitle
+          )
+        );
+
+      // Buyout: non-owner can close instantly at buyOutPrice and become winner.
+      allow update: if isSignedIn()
+        && request.auth.uid != resource.data.sellerId
+        && resource.data.isClosed != true
+        && request.time.toMillis() < resource.data.closingTimeMillis
+        && request.writeFields.hasOnly([
+          'isClosed',
+          'closedAtMillis',
+          'hasBid',
+          'currentBid',
+          'currentBidderId',
+          'closingBid',
+          'winnerUserId'
+        ])
+        && request.resource.data.isClosed == true
+        && request.resource.data.closedAtMillis is int
+        && request.resource.data.hasBid == true
+        && isNumber(request.resource.data.currentBid)
+        && isNumber(request.resource.data.closingBid)
+        && request.resource.data.currentBidderId == request.auth.uid
+        && request.resource.data.winnerUserId == request.auth.uid
+        && request.resource.data.currentBid == request.resource.data.buyOutPrice
+        && request.resource.data.closingBid == request.resource.data.buyOutPrice;
+
+      // Auto-close after expiry: allow any signed-in user to close, but only
+      // at/after `closingTimeMillis`, with deterministic closedAtMillis.
+      allow update: if isSignedIn()
+        && resource.data.isClosed != true
+        && request.time.toMillis() >= resource.data.closingTimeMillis
+        && request.resource.data.isClosed == true
+        && request.resource.data.closedAtMillis == resource.data.closingTimeMillis
+        && (
+          (
+            // Expired with bids: must write closingBid + winnerUserId.
+            resource.data.hasBid == true
+            && request.writeFields.hasOnly(['isClosed', 'closedAtMillis', 'closingBid', 'winnerUserId'])
+            && isNumber(resource.data.currentBid)
+            && isNumber(request.resource.data.closingBid)
+            && request.resource.data.closingBid == resource.data.currentBid
+            && request.resource.data.winnerUserId is string
+            && request.resource.data.winnerUserId == resource.data.currentBidderId
+          )
+          ||
+          (
+            // Expired with no bids.
+            resource.data.hasBid != true
+            && request.writeFields.hasOnly(['isClosed', 'closedAtMillis'])
           )
         );
 
@@ -83,65 +151,32 @@ service cloud.firestore {
         // skew vs server time, which would surface as a confusing
         // PERMISSION_DENIED during bidding. The app enforces the cutoff in the
         // repository/ViewModel for demo correctness.
-        // Only allow bidders to write the bid state fields.
-        // `request.writeFields` is more reliable than diff(changedKeys) for
-        // patch updates and transactions.
-        && request.writeFields.hasOnly(['hasBid', 'currentBid', 'currentBidderId'])
-        && isNumber(request.resource.data.currentBid)
-        && request.resource.data.currentBid > 0
-        && request.resource.data.currentBidderId == request.auth.uid
-        && (
-          // First bid
-          (
-            (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
-            // Don't compare against `startingBid` in rules to avoid int/float
-            // type-mismatch surprises (the app enforces the minimum).
-          )
-          ||
-          // Subsequent bids
-          (
-            isNumber(resource.data.currentBid)
-            && request.resource.data.currentBid > resource.data.currentBid
-          )
-        );
-
-      // Fallback bidder rule: explicitly require all non-bid fields remain
-      // unchanged. This keeps the demo safe even if `request.writeFields`
-      // behaves unexpectedly in some SDK/write paths.
-      allow update: if isSignedIn()
-        && request.auth.uid != resource.data.sellerId
-        && resource.data.isClosed != true
-        && request.resource.data.sellerId == resource.data.sellerId
-        && request.resource.data.bikeId == resource.data.bikeId
-        && request.resource.data.brandKey == resource.data.brandKey
-        && request.resource.data.brandLabel == resource.data.brandLabel
-        && request.resource.data.category == resource.data.category
-        && request.resource.data.displacementBucket == resource.data.displacementBucket
-        && request.resource.data.bikeTitle == resource.data.bikeTitle
-        && request.resource.data.startingBid == resource.data.startingBid
-        && request.resource.data.buyOutPrice == resource.data.buyOutPrice
-        && request.resource.data.dateCreatedMillis == resource.data.dateCreatedMillis
-        && request.resource.data.closingTimeMillis == resource.data.closingTimeMillis
-        && request.resource.data.isClosed == resource.data.isClosed
-        && request.resource.data.closedAtMillis == resource.data.closedAtMillis
-        && request.resource.data.closingBid == resource.data.closingBid
-        && request.resource.data.listingComments == resource.data.listingComments
-        && request.resource.data.hasBid == true
-        && isNumber(request.resource.data.currentBid)
-        && request.resource.data.currentBid > 0
-        && request.resource.data.currentBidderId == request.auth.uid
-        && (
-          (
-            (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
-            // Don't compare against `startingBid` in rules to avoid int/float
-            // type-mismatch surprises (the app enforces the minimum).
-          )
-          ||
-          (
-            isNumber(resource.data.currentBid)
-            && request.resource.data.currentBid > resource.data.currentBid
-          )
-        );
+        // Only allow bidders to change the bid state fields.
+        // Use diff().affectedKeys() so this works consistently for update() and
+        // set(..., merge: true) style writes.
+        // && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        //   'hasBid',
+        //   'currentBid',
+        //   'currentBidderId'
+        // ])
+        // && request.resource.data.hasBid == true
+        // && isNumber(request.resource.data.currentBid)
+        // && request.resource.data.currentBid > 0
+        // && request.resource.data.currentBidderId == request.auth.uid
+        // && (
+        //   // First bid
+        //   (
+        //     (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
+        //     // Don't compare against `startingBid` in rules to avoid int/float
+        //     // type-mismatch surprises (the app enforces the minimum).
+        //   )
+        //   ||
+        //   // Subsequent bids
+        //   (
+        //     isNumber(resource.data.currentBid)
+        //     && request.resource.data.currentBid > resource.data.currentBid
+        //   )
+        // );
 
       allow delete: if false;
     }

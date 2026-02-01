@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/time.dart';
 import '../../di/providers.dart';
 import '../../domain/enums.dart';
 import '../../domain/models/shop_listing.dart';
@@ -45,8 +46,8 @@ class ShopDirectoryState {
 
 final shopDirectoryViewModelProvider =
     NotifierProvider.autoDispose<ShopDirectoryViewModel, ShopDirectoryState>(
-  ShopDirectoryViewModel.new,
-);
+      ShopDirectoryViewModel.new,
+    );
 
 class ShopDirectoryViewModel extends AutoDisposeNotifier<ShopDirectoryState> {
   @override
@@ -74,7 +75,10 @@ class ShopDirectoryViewModel extends AutoDisposeNotifier<ShopDirectoryState> {
       Iterable<ShopListing> filtered = fetched;
 
       // Default behavior from SSOT: show open listings by default.
-      filtered = filtered.where((l) => !l.isClosed);
+      final now = nowMillis();
+      filtered = filtered.where(
+        (l) => !l.isClosed && now < l.closingTimeMillis,
+      );
 
       final selectedBrandKey = state.brandKey;
       final selectedCategory = state.category;

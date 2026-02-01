@@ -4,7 +4,7 @@
 // Fields: bikeId, sellerId, brandKey, brandLabel, category, displacementBucket, bikeTitle,
 // hasBid, startingBid, currentBid?, currentBidderId?, buyOutPrice,
 // dateCreatedMillis, closingTimeMillis,
-// isClosed, closedAtMillis?, closingBid?, listingComments
+// isClosed, closedAtMillis?, closingBid?, winnerUserId?, listingComments
 // Includes: fromFirestore/toFirestore
 
 class ShopListing {
@@ -27,6 +27,7 @@ class ShopListing {
     required this.isClosed,
     required this.closedAtMillis,
     required this.closingBid,
+    this.winnerUserId,
     required this.listingComments,
   });
 
@@ -48,6 +49,7 @@ class ShopListing {
   final bool isClosed;
   final int? closedAtMillis;
   final double? closingBid;
+  final String? winnerUserId;
   final String listingComments;
 
   Map<String, dynamic> toFirestore() {
@@ -74,6 +76,7 @@ class ShopListing {
     if (currentBidderId != null) data['currentBidderId'] = currentBidderId;
     if (closedAtMillis != null) data['closedAtMillis'] = closedAtMillis;
     if (closingBid != null) data['closingBid'] = closingBid;
+    if (winnerUserId != null) data['winnerUserId'] = winnerUserId;
 
     return data;
   }
@@ -101,6 +104,7 @@ class ShopListing {
       isClosed: _readBoolOrDefault(data['isClosed'], defaultValue: false),
       closedAtMillis: _readIntNullable(data['closedAtMillis']),
       closingBid: _readDoubleNullable(data['closingBid']),
+      winnerUserId: _readStringNullable(data['winnerUserId']),
       listingComments: _readStringOrDefault(
         data['listingComments'],
         defaultValue: '',
