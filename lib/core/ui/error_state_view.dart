@@ -4,6 +4,7 @@
 // - Used for network failure handling requirement
 
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ErrorStateView extends StatelessWidget {
 	const ErrorStateView({
@@ -27,7 +28,7 @@ class ErrorStateView extends StatelessWidget {
 						const SizedBox(height: 12),
 						Text(message, textAlign: TextAlign.center),
 						const SizedBox(height: 12),
-						FilledButton(onPressed: onRetry, child: const Text('Retry')),
+						ShadButton(onPressed: onRetry, child: const Text('Retry')),
 					],
 				),
 			),

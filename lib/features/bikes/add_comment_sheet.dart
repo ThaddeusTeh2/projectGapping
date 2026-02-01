@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_snackbar.dart';
 import '../../core/validation/validators.dart';
@@ -75,24 +76,24 @@ class _AddCommentSheetState extends ConsumerState<AddCommentSheet> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                IconButton(
+                ShadIconButton.ghost(
                   onPressed: isSubmitting ? null : () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            ShadInputFormField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
+              label: const Text('Title'),
               maxLength: Validators.commentTitleMaxLength,
               validator: Validators.commentTitle,
               enabled: !isSubmitting,
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            ShadInputFormField(
               controller: _bodyController,
-              decoration: const InputDecoration(labelText: 'Comment'),
+              label: const Text('Comment'),
               minLines: 3,
               maxLines: 6,
               maxLength: Validators.commentBodyMaxLength,
@@ -102,7 +103,7 @@ class _AddCommentSheetState extends ConsumerState<AddCommentSheet> {
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: FilledButton(
+              child: ShadButton(
                 onPressed: isSubmitting ? null : _submit,
                 child: Text(isSubmitting ? 'Posting…' : 'Post'),
               ),

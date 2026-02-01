@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -87,19 +88,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
+                ShadInputFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  label: const Text('Email'),
                   validator: Validators.email,
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                ShadInputFormField(
                   controller: _passwordController,
                   obscureText: true,
                   autofillHints: const [AutofillHints.password],
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  label: const Text('Password'),
                   validator: Validators.password,
                 ),
                 if (_errorMessage != null) ...[
@@ -112,7 +113,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton(
+                  child: ShadButton(
                     onPressed: _isLoading ? null : _submit,
                     child: _isLoading
                         ? const SizedBox(
@@ -124,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextButton(
+                ShadButton.link(
                   onPressed: _isLoading ? null : () => context.go('/register'),
                   child: const Text('No account? Register'),
                 ),

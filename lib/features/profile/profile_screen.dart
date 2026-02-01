@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -25,10 +26,12 @@ class ProfileScreen extends ConsumerWidget {
     return AppScaffold(
       title: 'Profile',
       actions: [
-        IconButton(
-          tooltip: 'Refresh',
-          onPressed: viewModel.refresh,
-          icon: const Icon(Icons.refresh),
+        Tooltip(
+          message: 'Refresh',
+          child: ShadIconButton.ghost(
+            onPressed: viewModel.refresh,
+            icon: const Icon(Icons.refresh),
+          ),
         ),
       ],
       body: profileAsync.when(
@@ -43,7 +46,7 @@ class ProfileScreen extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               const SizedBox(height: 12),
-              FilledButton(
+              ShadButton(
                 onPressed: () async {
                   try {
                     await auth.signOut();
@@ -92,7 +95,7 @@ class _MyListingsSection extends StatelessWidget {
     return Column(
       children: [
         for (final listing in listings)
-          Card(
+          ShadCard(
             child: ListTile(
               title: Text(listing.bikeTitle),
               subtitle: Text(
@@ -121,7 +124,7 @@ class _MyBidsSection extends StatelessWidget {
     return Column(
       children: [
         for (final bid in bids)
-          Card(
+          ShadCard(
             child: ListTile(
               title: Text('Bid: ${bid.amount.toStringAsFixed(0)}'),
               subtitle: Text('Listing: ${bid.listingId}'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/empty_state_view.dart';
@@ -140,13 +141,14 @@ class BikeDirectoryScreen extends ConsumerWidget {
                   ],
                   child: const Chip(label: Text('Sort')),
                 ),
-                TextButton(
+                ShadButton.ghost(
+                  size: ShadButtonSize.sm,
                   onPressed:
                       (state.brandKey != null ||
-                          state.category != null ||
-                          state.displacementBucket != null)
-                      ? viewModel.clearFilters
-                      : null,
+                              state.category != null ||
+                              state.displacementBucket != null)
+                          ? viewModel.clearFilters
+                          : null,
                   child: const Text('Clear'),
                 ),
               ],
@@ -172,15 +174,17 @@ class BikeDirectoryScreen extends ConsumerWidget {
                       padding: EdgeInsets.only(bottom: 12),
                       child: Text('Bike directory (Day 3: filters + sort).'),
                     ),
-                    for (final bike in bikes)
+                    for (var i = 0; i < bikes.length; i++) ...[
                       ListTile(
-                        title: Text(bike.title),
+                        title: Text(bikes[i].title),
                         subtitle: Text(
-                          '${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}',
+                          '${bikes[i].brandLabel} · ${bikes[i].category} · ${bikes[i].displacementBucket}',
                         ),
                         trailing: const Icon(Icons.chevron_right),
-                        onTap: () => context.go('/bike/${bike.id}'),
+                        onTap: () => context.go('/bike/${bikes[i].id}'),
                       ),
+                      if (i != bikes.length - 1) const Divider(height: 1),
+                    ],
                   ],
                 );
               },

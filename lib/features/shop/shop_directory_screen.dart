@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/empty_state_view.dart';
@@ -129,7 +130,8 @@ class ShopDirectoryScreen extends ConsumerWidget {
                     await viewModel.setDisplacementBucket(selected);
                   },
                 ),
-                TextButton(
+                ShadButton.ghost(
+                  size: ShadButtonSize.sm,
                   onPressed:
                       (state.brandKey != null ||
                               state.category != null ||
@@ -159,9 +161,12 @@ class ShopDirectoryScreen extends ConsumerWidget {
                 return ListView(
                   children: [
                     for (final listing in visible)
-                      _ListingCard(
-                        listing: listing,
-                        onTap: () => context.go('/listing/${listing.id}'),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _ListingCard(
+                          listing: listing,
+                          onTap: () => context.go('/listing/${listing.id}'),
+                        ),
                       ),
                   ],
                 );
@@ -206,7 +211,7 @@ class _ListingCard extends StatelessWidget {
         ? 'No bids'
         : 'Current: ${listing.currentBid!.toStringAsFixed(0)}';
 
-    return Card(
+    return ShadCard(
       child: ListTile(
         title: Text(listing.bikeTitle),
         subtitle: Text('${listing.brandLabel} · ${listing.category} · $bucketLabel\n$bidLabel · Closes in: $closesIn'),

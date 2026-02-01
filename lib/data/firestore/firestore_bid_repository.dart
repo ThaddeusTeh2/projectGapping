@@ -1,8 +1,10 @@
 // Firestore-backed BidRepository implementation.
 //
-// Spark-plan Day 6 pivot: place bids using a Firestore transaction.
-// This keeps the repo boundary intact and gives the demo “real” bid behavior
-// without requiring Cloud Functions.
+// Places bids by updating the listing doc directly:
+// - listings/{listingId}.currentBid
+// - listings/{listingId}.hasBid
+//
+// This intentionally does NOT create a separate `bids/{bidId}` document.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,17 +13,6 @@ import 'package:flutter/foundation.dart';
 
 import '../repositories/bid_repository.dart';
 import 'firestore_paths.dart';
-
-// Debug-only probe to pinpoint whether PERMISSION_DENIED is coming from
-// `bids/{bidId}` create or `listings/{listingId}` update.
-//
-// If enabled and the main transaction hits permission-denied, the repo will
-// attempt a *standalone* bid create and log whether it succeeds.
-//
-// NOTE: If the probe succeeds, it creates an orphan bid doc (because the main
-// transaction still failed). You can delete that doc in Firebase Console.
-const bool _kEnablePermissionProbe = kDebugMode;
-final Set<String> _permissionProbeRanForListingIds = <String>{};
 
 class FirestoreBidRepository implements BidRepository {
   FirestoreBidRepository({
@@ -55,7 +46,6 @@ class FirestoreBidRepository implements BidRepository {
     final listingRef = _firestore
         .collection(FirestorePaths.listings)
         .doc(listingId);
-    final bidRef = _firestore.collection(FirestorePaths.bids).doc();
 
     try {
       await _firestore.runTransaction((tx) async {
@@ -100,16 +90,10 @@ class FirestoreBidRepository implements BidRepository {
           }
         }
 
-        tx.set(bidRef, <String, dynamic>{
-          'listingId': listingId,
-          'bidderId': user.uid,
-          'amount': amount,
-          'dateCreatedMillis': nowMillis,
-        });
-
         tx.update(listingRef, <String, dynamic>{
           'currentBid': amount,
           'hasBid': true,
+          'currentBidderId': user.uid,
         });
       });
     } on FirebaseException catch (e) {
@@ -119,18 +103,6 @@ class FirestoreBidRepository implements BidRepository {
         debugPrint(
           'placeBid permission-denied: projectId=${Firebase.app().options.projectId} uid=${user.uid} listingId=$listingId',
         );
-
-        if (kDebugMode &&
-            _kEnablePermissionProbe &&
-            !_permissionProbeRanForListingIds.contains(listingId)) {
-          _permissionProbeRanForListingIds.add(listingId);
-          await _probeBidCreateOnly(
-            firestore: _firestore,
-            listingId: listingId,
-            uid: user.uid,
-            amount: amount,
-          );
-        }
       }
       throw StateError(
         msg == null || msg.isEmpty
@@ -138,32 +110,6 @@ class FirestoreBidRepository implements BidRepository {
             : 'Firestore error (${e.code}): $msg',
       );
     }
-  }
-}
-
-Future<void> _probeBidCreateOnly({
-  required FirebaseFirestore firestore,
-  required String listingId,
-  required String uid,
-  required double amount,
-}) async {
-  final ref = firestore.collection(FirestorePaths.bids).doc();
-  final nowMillis = DateTime.now().millisecondsSinceEpoch;
-
-  try {
-    await ref.set(<String, dynamic>{
-      'listingId': listingId,
-      'bidderId': uid,
-      'amount': amount,
-      'dateCreatedMillis': nowMillis,
-    });
-    debugPrint(
-      'PERMISSION PROBE: bids create SUCCEEDED (bidId=${ref.id}). Listing update rule likely denied. Delete this orphan bid in Console if desired.',
-    );
-  } on FirebaseException catch (e) {
-    debugPrint(
-      'PERMISSION PROBE: bids create FAILED (${e.code}): ${e.message}',
-    );
   }
 }
 

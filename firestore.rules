@@ -1,20 +1,180 @@
 rules_version = '2';
 
-// DEBUG RULESET (TEMP):
-// Allow any signed-in user to create/update/delete any document.
-// Use only for local/dev debugging; do NOT ship this.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() {
       return request.auth != null;
     }
 
-    match /{document=**} {
-      // Keep reads open for demo/dev convenience.
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function hasOnlyKeys(allowedKeys) {
+      return request.resource.data.keys().hasOnly(allowedKeys);
+    }
+
+    function isNumber(value) {
+      return value is int || value is float;
+    }
+
+    // --- Public reads (demo scale) ---
+    match /motorcycles/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /listings/{listingId} {
       allow read: if true;
 
-      // Write access for any authenticated user.
-      allow create, update, delete: if isSignedIn();
+      // Create listing: seller-only, immutable core fields, and bid fields must start clean.
+      allow create: if isSignedIn()
+        && request.resource.data.sellerId == request.auth.uid
+        && request.resource.data.isClosed == false
+        && request.resource.data.hasBid == false
+        && isNumber(request.resource.data.startingBid)
+        && request.resource.data.closingTimeMillis is int
+        && isNumber(request.resource.data.buyOutPrice)
+        && request.resource.data.dateCreatedMillis is int
+        // Prefer `currentBid` absent on create; if present it must be null.
+        && (!('currentBid' in request.resource.data) || request.resource.data.currentBid == null)
+        && (!('currentBidderId' in request.resource.data) || request.resource.data.currentBidderId == null)
+        && (!('closedAtMillis' in request.resource.data) || request.resource.data.closedAtMillis == null)
+        && (!('closingBid' in request.resource.data) || request.resource.data.closingBid == null);
+
+      // Seller can update/close listing. Keep this permissive but field-constrained.
+      allow update: if isOwner(resource.data.sellerId)
+        && (
+          // Seller closing path.
+          (
+            request.resource.data.isClosed == true
+            // Treat missing isClosed as "not closed" for older docs.
+            && resource.data.isClosed != true
+            && request.resource.data.closedAtMillis is int
+            // closingBid can be absent/null if no bids.
+            && (!('closingBid' in request.resource.data) || request.resource.data.closingBid == null || isNumber(request.resource.data.closingBid))
+          )
+          ||
+          // Seller non-bid edits (notes only) while open.
+          (
+            request.resource.data.isClosed == resource.data.isClosed
+            && request.resource.data.hasBid == resource.data.hasBid
+            && request.resource.data.currentBid == resource.data.currentBid
+            && request.resource.data.currentBidderId == resource.data.currentBidderId
+            && request.resource.data.closingTimeMillis == resource.data.closingTimeMillis
+            && request.resource.data.startingBid == resource.data.startingBid
+            && request.resource.data.buyOutPrice == resource.data.buyOutPrice
+            && request.resource.data.bikeId == resource.data.bikeId
+            && request.resource.data.brandKey == resource.data.brandKey
+            && request.resource.data.brandLabel == resource.data.brandLabel
+            && request.resource.data.category == resource.data.category
+            && request.resource.data.displacementBucket == resource.data.displacementBucket
+            && request.resource.data.bikeTitle == resource.data.bikeTitle
+          )
+        );
+
+      // Bidding users can ONLY bump currentBid + hasBid.
+      allow update: if isSignedIn()
+        && request.auth.uid != resource.data.sellerId
+        // Treat missing isClosed as "not closed" for older docs.
+        && resource.data.isClosed != true
+        // Note: we intentionally do NOT enforce `closingTimeMillis` using
+        // `request.time` here, because client-created listings can have clock
+        // skew vs server time, which would surface as a confusing
+        // PERMISSION_DENIED during bidding. The app enforces the cutoff in the
+        // repository/ViewModel for demo correctness.
+        // Only allow bidders to write the bid state fields.
+        // `request.writeFields` is more reliable than diff(changedKeys) for
+        // patch updates and transactions.
+        && request.writeFields.hasOnly(['hasBid', 'currentBid', 'currentBidderId'])
+        && isNumber(request.resource.data.currentBid)
+        && request.resource.data.currentBid > 0
+        && request.resource.data.currentBidderId == request.auth.uid
+        && (
+          // First bid
+          (
+            (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
+            // Don't compare against `startingBid` in rules to avoid int/float
+            // type-mismatch surprises (the app enforces the minimum).
+          )
+          ||
+          // Subsequent bids
+          (
+            isNumber(resource.data.currentBid)
+            && request.resource.data.currentBid > resource.data.currentBid
+          )
+        );
+
+      // Fallback bidder rule: explicitly require all non-bid fields remain
+      // unchanged. This keeps the demo safe even if `request.writeFields`
+      // behaves unexpectedly in some SDK/write paths.
+      allow update: if isSignedIn()
+        && request.auth.uid != resource.data.sellerId
+        && resource.data.isClosed != true
+        && request.resource.data.sellerId == resource.data.sellerId
+        && request.resource.data.bikeId == resource.data.bikeId
+        && request.resource.data.brandKey == resource.data.brandKey
+        && request.resource.data.brandLabel == resource.data.brandLabel
+        && request.resource.data.category == resource.data.category
+        && request.resource.data.displacementBucket == resource.data.displacementBucket
+        && request.resource.data.bikeTitle == resource.data.bikeTitle
+        && request.resource.data.startingBid == resource.data.startingBid
+        && request.resource.data.buyOutPrice == resource.data.buyOutPrice
+        && request.resource.data.dateCreatedMillis == resource.data.dateCreatedMillis
+        && request.resource.data.closingTimeMillis == resource.data.closingTimeMillis
+        && request.resource.data.isClosed == resource.data.isClosed
+        && request.resource.data.closedAtMillis == resource.data.closedAtMillis
+        && request.resource.data.closingBid == resource.data.closingBid
+        && request.resource.data.listingComments == resource.data.listingComments
+        && request.resource.data.hasBid == true
+        && isNumber(request.resource.data.currentBid)
+        && request.resource.data.currentBid > 0
+        && request.resource.data.currentBidderId == request.auth.uid
+        && (
+          (
+            (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
+            // Don't compare against `startingBid` in rules to avoid int/float
+            // type-mismatch surprises (the app enforces the minimum).
+          )
+          ||
+          (
+            isNumber(resource.data.currentBid)
+            && request.resource.data.currentBid > resource.data.currentBid
+          )
+        );
+
+      allow delete: if false;
+    }
+
+    match /bids/{bidId} {
+      allow read: if true;
+
+      // Allow authenticated bid creation.
+      allow create: if isSignedIn()
+        && request.resource.data.bidderId == request.auth.uid
+        && request.resource.data.listingId is string
+        && isNumber(request.resource.data.amount)
+        && request.resource.data.amount > 0
+        && request.resource.data.dateCreatedMillis is int
+        && hasOnlyKeys(['listingId', 'bidderId', 'amount', 'dateCreatedMillis']);
+
+      allow update, delete: if false;
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+
+      // Keep vote counters demo-simple for now.
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false;
     }
   }
 }

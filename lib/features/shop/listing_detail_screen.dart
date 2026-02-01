@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -112,7 +113,7 @@ class ListingDetailScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton.icon(
+                child: ShadButton(
                   onPressed: state.mutation.isLoading
                       ? null
                       : () async {
@@ -127,8 +128,8 @@ class ListingDetailScreen extends ConsumerWidget {
                             AppSnackbar.showSuccess(context, 'Listing closed');
                           }
                         },
-                  icon: const Icon(Icons.lock_outline),
-                  label: Text(isOwner ? 'Close Listing Early' : 'Close Listing (Owner only)'),
+                  leading: const Icon(Icons.lock_outline),
+                  child: Text(isOwner ? 'Close Listing Early' : 'Close Listing (Owner only)'),
                 ),
               ),
             ],
@@ -186,11 +187,11 @@ class _BidSectionState extends ConsumerState<_BidSection> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
+              ShadInputFormField(
                 controller: _amountController,
                 enabled: widget.enabled,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Amount (MYR)'),
+                label: const Text('Amount (MYR)'),
                 validator: (v) => Validators.bidAmount(
                   value: v,
                   currentBid: widget.currentBid,
@@ -200,7 +201,7 @@ class _BidSectionState extends ConsumerState<_BidSection> {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
+                child: ShadButton(
                   onPressed: widget.enabled
                       ? () async {
                           final valid = _formKey.currentState?.validate() ?? false;

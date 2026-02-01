@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -59,10 +60,12 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
     return AppScaffold(
       title: 'Create Listing',
       actions: [
-        IconButton(
-          tooltip: 'Reload bikes',
-          onPressed: isSubmitting ? null : viewModel.retry,
-          icon: const Icon(Icons.refresh),
+        Tooltip(
+          message: 'Reload bikes',
+          child: ShadIconButton.ghost(
+            onPressed: isSubmitting ? null : viewModel.retry,
+            icon: const Icon(Icons.refresh),
+          ),
         ),
       ],
       body: ListView(
@@ -72,13 +75,11 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
-          TextField(
+          ShadInputFormField(
             controller: _searchController,
             enabled: !isSubmitting,
-            decoration: const InputDecoration(
-              labelText: 'Search',
-              hintText: 'Type a model name…',
-            ),
+            label: const Text('Search'),
+            placeholder: const Text('Type a model name…'),
             onChanged: viewModel.setQuery,
           ),
           const SizedBox(height: 12),
@@ -115,14 +116,20 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   ),
                   const SizedBox(height: 8),
                   for (final bike in visible)
-                    Card(
-                      child: ListTile(
-                        title: Text(bike.title),
-                        subtitle: Text('${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}'),
-                        trailing: state.selectedBike?.id == bike.id
-                            ? const Icon(Icons.check)
-                            : null,
-                        onTap: isSubmitting ? null : () => viewModel.selectBike(bike),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: ShadCard(
+                        child: ListTile(
+                          title: Text(bike.title),
+                          subtitle: Text(
+                            '${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}',
+                          ),
+                          trailing: state.selectedBike?.id == bike.id
+                              ? const Icon(Icons.check)
+                              : null,
+                          onTap:
+                              isSubmitting ? null : () => viewModel.selectBike(bike),
+                        ),
                       ),
                     ),
                 ],
@@ -144,19 +151,19 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
             key: _formKey,
             child: Column(
               children: [
-                TextFormField(
+                ShadInputFormField(
                   controller: _startingBidController,
                   enabled: !isSubmitting,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Starting Bid (MYR)'),
+                  label: const Text('Starting Bid (MYR)'),
                   validator: Validators.listingStartingBid,
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                ShadInputFormField(
                   controller: _buyoutController,
                   enabled: !isSubmitting,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Buyout Price (MYR)'),
+                  label: const Text('Buyout Price (MYR)'),
                   validator: (v) => Validators.listingBuyoutPrice(
                     buyoutValue: v,
                     startingBid: startingBid,
@@ -169,17 +176,17 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                   onChanged: (p) => setState(() => _preset = p),
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                ShadInputFormField(
                   controller: _notesController,
                   enabled: !isSubmitting,
-                  decoration: const InputDecoration(labelText: 'Listing Notes'),
+                  label: const Text('Listing Notes'),
                   minLines: 2,
                   maxLines: 5,
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(
+                  child: ShadButton(
                     onPressed: isSubmitting
                         ? null
                         : () async {
@@ -217,8 +224,8 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                             AppSnackbar.showSuccess(context, 'Listing published');
                             context.go('/listing/$listingId');
                           },
-                    icon: const Icon(Icons.publish),
-                    label: Text(isSubmitting ? 'Publishing…' : 'Publish Listing'),
+                    leading: const Icon(Icons.publish),
+                    child: Text(isSubmitting ? 'Publishing…' : 'Publish Listing'),
                   ),
                 ),
               ],
@@ -245,14 +252,16 @@ class _SelectedBikeCard extends StatelessWidget {
       );
     }
 
-    return Card(
+    return ShadCard(
       child: ListTile(
         title: Text(bike!.title),
         subtitle: Text('${bike!.brandLabel} · ${bike!.category} · ${bike!.displacementBucket}'),
-        trailing: IconButton(
-          tooltip: 'Clear selection',
-          onPressed: onClear,
-          icon: const Icon(Icons.close),
+        trailing: Tooltip(
+          message: 'Clear selection',
+          child: ShadIconButton.ghost(
+            onPressed: onClear,
+            icon: const Icon(Icons.close),
+          ),
         ),
       ),
     );

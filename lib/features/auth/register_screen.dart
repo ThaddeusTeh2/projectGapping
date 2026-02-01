@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -89,27 +90,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
+                ShadInputFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  label: const Text('Email'),
                   validator: Validators.email,
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                ShadInputFormField(
                   controller: _passwordController,
                   obscureText: true,
                   autofillHints: const [AutofillHints.newPassword],
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  label: const Text('Password'),
                   validator: Validators.password,
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
+                ShadInputFormField(
                   controller: _confirmController,
                   obscureText: true,
                   autofillHints: const [AutofillHints.newPassword],
-                  decoration: const InputDecoration(labelText: 'Confirm password'),
+                  label: const Text('Confirm password'),
                   validator: (v) => Validators.confirmPassword(
                     password: _passwordController.text,
                     confirm: v,
@@ -125,7 +126,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton(
+                  child: ShadButton(
                     onPressed: _isLoading ? null : _submit,
                     child: _isLoading
                         ? const SizedBox(
@@ -137,7 +138,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextButton(
+                ShadButton.link(
                   onPressed: _isLoading ? null : () => context.go('/login'),
                   child: const Text('Already have an account? Login'),
                 ),

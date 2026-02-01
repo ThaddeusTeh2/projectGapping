@@ -2,7 +2,7 @@
 // Firestore: listings/{listingId}
 // Bid-only listing.
 // Fields: bikeId, sellerId, brandKey, brandLabel, category, displacementBucket, bikeTitle,
-// hasBid, startingBid, currentBid?, buyOutPrice,
+// hasBid, startingBid, currentBid?, currentBidderId?, buyOutPrice,
 // dateCreatedMillis, closingTimeMillis,
 // isClosed, closedAtMillis?, closingBid?, listingComments
 // Includes: fromFirestore/toFirestore
@@ -20,6 +20,7 @@ class ShopListing {
     required this.hasBid,
     required this.startingBid,
     required this.currentBid,
+    this.currentBidderId,
     required this.buyOutPrice,
     required this.dateCreatedMillis,
     required this.closingTimeMillis,
@@ -40,6 +41,7 @@ class ShopListing {
   final bool hasBid;
   final double startingBid;
   final double? currentBid;
+  final String? currentBidderId;
   final double buyOutPrice;
   final int dateCreatedMillis;
   final int closingTimeMillis;
@@ -69,6 +71,7 @@ class ShopListing {
     // Omit nullable fields when unset. Some security rules require fields to be
     // absent (not null), e.g. `currentBid` on listing creation.
     if (currentBid != null) data['currentBid'] = currentBid;
+    if (currentBidderId != null) data['currentBidderId'] = currentBidderId;
     if (closedAtMillis != null) data['closedAtMillis'] = closedAtMillis;
     if (closingBid != null) data['closingBid'] = closingBid;
 
@@ -91,6 +94,7 @@ class ShopListing {
       hasBid: _readBoolOrDefault(data['hasBid'], defaultValue: false),
       startingBid: _readDouble(data, 'startingBid'),
       currentBid: _readDoubleNullable(data['currentBid']),
+      currentBidderId: _readStringNullable(data['currentBidderId']),
       buyOutPrice: _readDouble(data, 'buyOutPrice'),
       dateCreatedMillis: _readInt(data, 'dateCreatedMillis'),
       closingTimeMillis: _readInt(data, 'closingTimeMillis'),
@@ -103,6 +107,12 @@ class ShopListing {
       ),
     );
   }
+}
+
+String? _readStringNullable(Object? value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  return null;
 }
 
 String _readString(Map<String, dynamic> data, String key) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
 import '../../core/ui/app_snackbar.dart';
@@ -8,6 +9,7 @@ import '../../core/ui/error_state_view.dart';
 import '../../core/ui/loading_view.dart';
 import 'add_comment_sheet.dart';
 import 'bike_detail_view_model.dart';
+
 class BikeDetailScreen extends ConsumerWidget {
   const BikeDetailScreen({super.key, required this.bikeId});
 
@@ -62,7 +64,7 @@ class BikeDetailScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: FilledButton.icon(
+                    child: ShadButton(
                       onPressed: () {
                         showModalBottomSheet<void>(
                           context: context,
@@ -70,8 +72,8 @@ class BikeDetailScreen extends ConsumerWidget {
                           builder: (context) => AddCommentSheet(bikeId: bikeId),
                         );
                       },
-                      icon: const Icon(Icons.add_comment),
-                      label: const Text('Add comment'),
+                      leading: const Icon(Icons.add_comment),
+                      child: const Text('Add comment'),
                     ),
                   ),
                 ],
@@ -91,39 +93,53 @@ class BikeDetailScreen extends ConsumerWidget {
                   return Column(
                     children: [
                       for (final c in comments)
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  c.commentTitle,
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(c.comment),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      tooltip: 'Upvote',
-                                      onPressed: () =>
-                                          viewModel.upvoteComment(c.id),
-                                      icon: const Icon(Icons.thumb_up),
-                                    ),
-                                    Text('${c.upvoteCount}'),
-                                    const SizedBox(width: 12),
-                                    IconButton(
-                                      tooltip: 'Downvote',
-                                      onPressed: () =>
-                                          viewModel.downvoteComment(c.id),
-                                      icon: const Icon(Icons.thumb_down),
-                                    ),
-                                    Text('${c.downvoteCount}'),
-                                  ],
-                                ),
-                              ],
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ShadCard(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    c.commentTitle,
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'User ID: ${c.userId}',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(c.comment),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Tooltip(
+                                        message: 'Upvote',
+                                        child: ShadIconButton.ghost(
+                                          onPressed: () =>
+                                              viewModel.upvoteComment(c.id),
+                                          icon: const Icon(Icons.thumb_up),
+                                        ),
+                                      ),
+                                      Text('${c.upvoteCount}'),
+                                      const SizedBox(width: 12),
+                                      Tooltip(
+                                        message: 'Downvote',
+                                        child: ShadIconButton.ghost(
+                                          onPressed: () => viewModel
+                                              .downvoteComment(c.id),
+                                          icon: const Icon(Icons.thumb_down),
+                                        ),
+                                      ),
+                                      Text('${c.downvoteCount}'),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
