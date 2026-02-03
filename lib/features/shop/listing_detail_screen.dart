@@ -260,7 +260,11 @@ class _SectionCard extends StatelessWidget {
             if (separated)
               for (var i = 0; i < children.length; i++) ...[
                 children[i],
-                if (i != children.length - 1) const Divider(height: 16),
+                if (i != children.length - 1)
+                  const ShadSeparator.horizontal(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    thickness: 1,
+                  ),
               ],
           ],
         ),

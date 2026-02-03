@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../core/ui/app_scaffold.dart';
@@ -33,6 +34,19 @@ class BikeDetailScreen extends ConsumerWidget {
 
     return AppScaffold(
       title: 'Bike Detail',
+      leading: Tooltip(
+        message: 'Back',
+        child: ShadIconButton.ghost(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/bikes');
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
       body: state.bike.when(
         data: (bike) {
           if (bike == null) {
@@ -78,7 +92,15 @@ class BikeDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       _kvText('Pricing', bike.seaPricingNote),
+                      const ShadSeparator.horizontal(
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        thickness: 1,
+                      ),
                       _kvText('Fuel', bike.seaFuelNote),
+                      const ShadSeparator.horizontal(
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        thickness: 1,
+                      ),
                       _kvText('Parts', bike.seaPartsNote),
                     ],
                   ),
@@ -130,15 +152,18 @@ class BikeDetailScreen extends ConsumerWidget {
                                       context,
                                     ).textTheme.titleSmall,
                                   ),
-                                  const SizedBox(height: 2),
+                                  const SizedBox(height: 6),
+                                  Text(c.comment),
+                                  const ShadSeparator.horizontal(
+                                    margin: EdgeInsets.symmetric(vertical: 8),
+                                    thickness: 1,
+                                  ),
                                   Text(
                                     'User ID: ${c.userId}',
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodySmall,
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(c.comment),
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [

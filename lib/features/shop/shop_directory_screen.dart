@@ -111,9 +111,20 @@ class _ShopDirectoryScreenState extends ConsumerState<ShopDirectoryScreen> {
         state.category != null ||
         state.displacementBucket != null ||
         state.query.trim().isNotEmpty;
+    final isRefreshing =
+        state.openListings.isLoading || state.closedListings.isLoading;
 
     return AppScaffold(
       title: 'Shop',
+      actions: [
+        Tooltip(
+          message: 'Refresh',
+          child: ShadIconButton.ghost(
+            onPressed: isRefreshing ? null : viewModel.retry,
+            icon: const Icon(Icons.refresh),
+          ),
+        ),
+      ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/listing/create'),
         label: const Text('Create Listing'),
@@ -132,80 +143,85 @@ class _ShopDirectoryScreenState extends ConsumerState<ShopDirectoryScreen> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _AccordionCard(
-              title: 'Filters',
+            child: Row(
               children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickBrand();
-                        await viewModel.setBrandKey(selected);
-                      },
-                      child: Text(activeBrandLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickCategory();
-                        await viewModel.setCategory(selected);
-                      },
-                      child: Text(activeCategoryLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickBucket();
-                        await viewModel.setDisplacementBucket(selected);
-                      },
-                      child: Text(activeBucketLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: canClear
-                          ? () {
-                              _searchController.clear();
-                              viewModel.clearAll();
-                            }
-                          : null,
-                      child: const Text('Clear'),
-                    ),
-                  ],
+                Tooltip(
+                  message: 'Filters',
+                  child: PopupMenuButton<_ShopFilterMenuAction>(
+                    icon: const Icon(Icons.filter_list),
+                    onSelected: (action) {
+                      switch (action) {
+                        case _ShopFilterMenuAction.brand:
+                          () async {
+                            final selected = await pickBrand();
+                            await viewModel.setBrandKey(selected);
+                          }();
+                          break;
+                        case _ShopFilterMenuAction.category:
+                          () async {
+                            final selected = await pickCategory();
+                            await viewModel.setCategory(selected);
+                          }();
+                          break;
+                        case _ShopFilterMenuAction.displacement:
+                          () async {
+                            final selected = await pickBucket();
+                            await viewModel.setDisplacementBucket(selected);
+                          }();
+                          break;
+                        case _ShopFilterMenuAction.clear:
+                          _searchController.clear();
+                          viewModel.clearAll();
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          value: _ShopFilterMenuAction.brand,
+                          child: Text('Brand: $activeBrandLabel'),
+                        ),
+                        PopupMenuItem(
+                          value: _ShopFilterMenuAction.category,
+                          child: Text('Category: $activeCategoryLabel'),
+                        ),
+                        PopupMenuItem(
+                          value: _ShopFilterMenuAction.displacement,
+                          child: Text('Displacement: $activeBucketLabel'),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          enabled: canClear,
+                          value: _ShopFilterMenuAction.clear,
+                          child: const Text('Clear'),
+                        ),
+                      ];
+                    },
+                  ),
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _AccordionCard(
-              title: 'Sort',
-              children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: state.sort == ShopSort.newest
-                          ? null
-                          : () => viewModel.setSort(ShopSort.newest),
-                      child: Text(
-                        '${state.sort == ShopSort.newest ? '✓ ' : ''}Newest',
-                      ),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: state.sort == ShopSort.closingSoon
-                          ? null
-                          : () => viewModel.setSort(ShopSort.closingSoon),
-                      child: Text(
-                        '${state.sort == ShopSort.closingSoon ? '✓ ' : ''}Closing soon',
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: 'Sort',
+                  child: PopupMenuButton<ShopSort>(
+                    icon: const Icon(Icons.sort),
+                    onSelected: viewModel.setSort,
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          value: ShopSort.newest,
+                          child: Text(
+                            '${state.sort == ShopSort.newest ? '✓ ' : ''}Newest',
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: ShopSort.closingSoon,
+                          child: Text(
+                            '${state.sort == ShopSort.closingSoon ? '✓ ' : ''}Closing soon',
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
                 ),
               ],
             ),
@@ -249,7 +265,10 @@ class _ShopDirectoryScreenState extends ConsumerState<ShopDirectoryScreen> {
                               ),
                             ),
                         const SizedBox(height: 8),
-                        const Divider(height: 24),
+                        const ShadSeparator.horizontal(
+                          margin: EdgeInsets.symmetric(vertical: 12),
+                          thickness: 1,
+                        ),
                         Text(
                           'Closed Listings',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -294,23 +313,7 @@ class _ShopDirectoryScreenState extends ConsumerState<ShopDirectoryScreen> {
   }
 }
 
-class _AccordionCard extends StatelessWidget {
-  const _AccordionCard({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShadCard(
-      child: ExpansionTile(
-        title: Text(title),
-        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        children: children,
-      ),
-    );
-  }
-}
+enum _ShopFilterMenuAction { brand, category, displacement, clear }
 
 class _ListingCard extends StatelessWidget {
   const _ListingCard({required this.listing, required this.onTap});

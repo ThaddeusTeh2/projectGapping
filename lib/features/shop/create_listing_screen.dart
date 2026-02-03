@@ -60,6 +60,19 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
 
     return AppScaffold(
       title: 'Create Listing',
+      leading: Tooltip(
+        message: 'Back',
+        child: ShadIconButton.ghost(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/shop');
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
       actions: [
         Tooltip(
           message: 'Reload bikes',
@@ -275,14 +288,35 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                             : ListView.separated(
                                 itemCount: visible.length,
                                 separatorBuilder: (_, __) =>
-                                    const Divider(height: 1),
+                                    const ShadSeparator.horizontal(
+                                      margin: EdgeInsets.zero,
+                                      thickness: 1,
+                                    ),
                                 itemBuilder: (context, i) {
                                   final bike = visible[i];
                                   final isSelected = bike.id == selectedId;
                                   return ListTile(
                                     title: Text(bike.title),
-                                    subtitle: Text(
-                                      '${bike.brandLabel} · ${bike.category} · ${bike.displacementBucket}',
+                                    subtitle: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        ShadBadge(child: Text(bike.brandLabel)),
+                                        ShadBadge(
+                                          child: Text(
+                                            bike.categoryEnum?.label ??
+                                                bike.category,
+                                          ),
+                                        ),
+                                        ShadBadge(
+                                          child: Text(
+                                            bike
+                                                    .displacementBucketEnum
+                                                    ?.label ??
+                                                bike.displacementBucket,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     trailing: isSelected
                                         ? const Icon(Icons.check)

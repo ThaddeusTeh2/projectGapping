@@ -108,9 +108,19 @@ class _BikeDirectoryScreenState extends ConsumerState<BikeDirectoryScreen> {
         state.category != null ||
         state.displacementBucket != null ||
         state.query.trim().isNotEmpty;
+    final isRefreshing = state.bikes.isLoading;
 
     return AppScaffold(
       title: 'Bikes',
+      actions: [
+        Tooltip(
+          message: 'Refresh',
+          child: ShadIconButton.ghost(
+            onPressed: isRefreshing ? null : viewModel.retry,
+            icon: const Icon(Icons.refresh),
+          ),
+        ),
+      ],
       body: Column(
         children: [
           ShadInputFormField(
@@ -124,89 +134,91 @@ class _BikeDirectoryScreenState extends ConsumerState<BikeDirectoryScreen> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _AccordionCard(
-              title: 'Filters',
+            child: Row(
               children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickBrand();
-                        await viewModel.setBrandKey(selected);
-                      },
-                      child: Text(activeBrandLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickCategory();
-                        await viewModel.setCategory(selected);
-                      },
-                      child: Text(activeCategoryLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: () async {
-                        final selected = await pickBucket();
-                        await viewModel.setDisplacementBucket(selected);
-                      },
-                      child: Text(activeBucketLabel),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: canClear
-                          ? () {
-                              _searchController.clear();
-                              viewModel.clearAll();
-                            }
-                          : null,
-                      child: const Text('Clear'),
-                    ),
-                  ],
+                Tooltip(
+                  message: 'Filters',
+                  child: PopupMenuButton<_BikeFilterMenuAction>(
+                    icon: const Icon(Icons.filter_list),
+                    onSelected: (action) {
+                      switch (action) {
+                        case _BikeFilterMenuAction.brand:
+                          () async {
+                            final selected = await pickBrand();
+                            await viewModel.setBrandKey(selected);
+                          }();
+                          break;
+                        case _BikeFilterMenuAction.category:
+                          () async {
+                            final selected = await pickCategory();
+                            await viewModel.setCategory(selected);
+                          }();
+                          break;
+                        case _BikeFilterMenuAction.displacement:
+                          () async {
+                            final selected = await pickBucket();
+                            await viewModel.setDisplacementBucket(selected);
+                          }();
+                          break;
+                        case _BikeFilterMenuAction.clear:
+                          _searchController.clear();
+                          viewModel.clearAll();
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          value: _BikeFilterMenuAction.brand,
+                          child: Text('Brand: $activeBrandLabel'),
+                        ),
+                        PopupMenuItem(
+                          value: _BikeFilterMenuAction.category,
+                          child: Text('Category: $activeCategoryLabel'),
+                        ),
+                        PopupMenuItem(
+                          value: _BikeFilterMenuAction.displacement,
+                          child: Text('Displacement: $activeBucketLabel'),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          enabled: canClear,
+                          value: _BikeFilterMenuAction.clear,
+                          child: const Text('Clear'),
+                        ),
+                      ];
+                    },
+                  ),
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _AccordionCard(
-              title: 'Sort',
-              children: [
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: state.sort == BikeSort.titleAsc
-                          ? null
-                          : () => viewModel.setSort(BikeSort.titleAsc),
-                      child: Text(
-                        '${state.sort == BikeSort.titleAsc ? '✓ ' : ''}Title',
-                      ),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: state.sort == BikeSort.dateCreatedDesc
-                          ? null
-                          : () => viewModel.setSort(BikeSort.dateCreatedDesc),
-                      child: Text(
-                        '${state.sort == BikeSort.dateCreatedDesc ? '✓ ' : ''}Newest',
-                      ),
-                    ),
-                    ShadButton.ghost(
-                      size: ShadButtonSize.sm,
-                      onPressed: state.sort == BikeSort.releaseYearDesc
-                          ? null
-                          : () => viewModel.setSort(BikeSort.releaseYearDesc),
-                      child: Text(
-                        '${state.sort == BikeSort.releaseYearDesc ? '✓ ' : ''}Year',
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: 'Sort',
+                  child: PopupMenuButton<BikeSort>(
+                    icon: const Icon(Icons.sort),
+                    onSelected: viewModel.setSort,
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          value: BikeSort.titleAsc,
+                          child: Text(
+                            '${state.sort == BikeSort.titleAsc ? '✓ ' : ''}Title',
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: BikeSort.dateCreatedDesc,
+                          child: Text(
+                            '${state.sort == BikeSort.dateCreatedDesc ? '✓ ' : ''}Newest',
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: BikeSort.releaseYearDesc,
+                          child: Text(
+                            '${state.sort == BikeSort.releaseYearDesc ? '✓ ' : ''}Year',
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
                 ),
               ],
             ),
@@ -222,18 +234,38 @@ class _BikeDirectoryScreenState extends ConsumerState<BikeDirectoryScreen> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(bottom: 12),
-                      child: Text('Bike directory (Day 3: filters + sort).'),
+                      child: Text('Bike directory.'),
                     ),
                     for (var i = 0; i < bikes.length; i++) ...[
                       ListTile(
                         title: Text(bikes[i].title),
-                        subtitle: Text(
-                          '${bikes[i].brandLabel} · ${bikes[i].category} · ${bikes[i].displacementBucket}',
+                        subtitle: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ShadBadge(child: Text(bikes[i].brandLabel)),
+                            ShadBadge(
+                              child: Text(
+                                bikes[i].categoryEnum?.label ??
+                                    bikes[i].category,
+                              ),
+                            ),
+                            ShadBadge(
+                              child: Text(
+                                bikes[i].displacementBucketEnum?.label ??
+                                    bikes[i].displacementBucket,
+                              ),
+                            ),
+                          ],
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.go('/bike/${bikes[i].id}'),
                       ),
-                      if (i != bikes.length - 1) const Divider(height: 1),
+                      if (i != bikes.length - 1)
+                        const ShadSeparator.horizontal(
+                          margin: EdgeInsets.zero,
+                          thickness: 1,
+                        ),
                     ],
                   ],
                 );
@@ -251,20 +283,4 @@ class _BikeDirectoryScreenState extends ConsumerState<BikeDirectoryScreen> {
   }
 }
 
-class _AccordionCard extends StatelessWidget {
-  const _AccordionCard({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShadCard(
-      child: ExpansionTile(
-        title: Text(title),
-        childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        children: children,
-      ),
-    );
-  }
-}
+enum _BikeFilterMenuAction { brand, category, displacement, clear }
