@@ -18,6 +18,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -27,6 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _displayNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
@@ -46,12 +48,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     final authRepo = ref.read(authRepositoryProvider);
+    final userRepo = ref.read(userRepositoryProvider);
 
     try {
       await authRepo.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      final user = authRepo.currentUser();
+      if (user != null) {
+        try {
+          await userRepo.setPublicDisplayName(
+            userId: user.uid,
+            displayName: _displayNameController.text.trim(),
+            updatedAtMillis: DateTime.now().millisecondsSinceEpoch,
+          );
+        } catch (_) {
+          // Best-effort: user can fix from Profile if this fails.
+        }
+      }
 
       if (!mounted) return;
       context.go('/bikes');
@@ -91,6 +107,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ShadInputFormField(
+                  controller: _displayNameController,
+                  autofillHints: const [AutofillHints.nickname],
+                  label: const Text('Display name'),
+                  validator: Validators.displayName,
+                ),
+                const SizedBox(height: 12),
+                ShadInputFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
@@ -120,7 +143,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: 12),
                   Text(
                     _errorMessage!,
-                    style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 16),

@@ -8,6 +8,7 @@ import '../../core/ui/app_snackbar.dart';
 import '../../core/ui/empty_state_view.dart';
 import '../../core/ui/error_state_view.dart';
 import '../../core/ui/loading_view.dart';
+import '../../di/providers.dart';
 import 'add_comment_sheet.dart';
 import 'bike_detail_view_model.dart';
 
@@ -158,12 +159,7 @@ class BikeDetailScreen extends ConsumerWidget {
                                     margin: EdgeInsets.symmetric(vertical: 8),
                                     thickness: 1,
                                   ),
-                                  Text(
-                                    'User ID: ${c.userId}',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
+                                  _UserLabel(uid: c.userId),
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
@@ -212,6 +208,25 @@ class BikeDetailScreen extends ConsumerWidget {
         loading: () => const LoadingView(message: 'Loading bike…'),
       ),
     );
+  }
+}
+
+class _UserLabel extends ConsumerWidget {
+  const _UserLabel({required this.uid});
+
+  final String uid;
+
+  String _shortUid(String value) {
+    if (value.length <= 8) return value;
+    return '${value.substring(0, 4)}…${value.substring(value.length - 4)}';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncName = ref.watch(displayNameByUidProvider(uid));
+    final name = asyncName.valueOrNull;
+    final text = name == null || name.trim().isEmpty ? _shortUid(uid) : name;
+    return Text('User: $text', style: Theme.of(context).textTheme.bodySmall);
   }
 }
 

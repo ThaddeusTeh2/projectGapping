@@ -93,11 +93,19 @@ class ListingDetailScreen extends ConsumerWidget {
                 title: 'People',
                 separated: true,
                 children: [
-                  _kv(context, 'Seller', listing.sellerId),
+                  _kv(
+                    context,
+                    'Seller',
+                    _displayNameOrShort(ref, listing.sellerId),
+                  ),
                   if (!listing.isClosed && listing.currentBidderId != null)
-                    _kv(context, 'Leader', listing.currentBidderId!),
+                    _kv(
+                      context,
+                      'Leader',
+                      _displayNameOrShort(ref, listing.currentBidderId!),
+                    ),
                   if (listing.isClosed && winnerId != null)
-                    _kv(context, 'Winner', winnerId),
+                    _kv(context, 'Winner', _displayNameOrShort(ref, winnerId)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -373,4 +381,12 @@ Widget _kv(BuildContext context, String label, String value) {
       Text(value),
     ],
   );
+}
+
+String _displayNameOrShort(WidgetRef ref, String uid) {
+  final asyncName = ref.watch(displayNameByUidProvider(uid));
+  final name = asyncName.valueOrNull;
+  if (name != null && name.trim().isNotEmpty) return name.trim();
+  if (uid.length <= 8) return uid;
+  return '${uid.substring(0, 4)}…${uid.substring(uid.length - 4)}';
 }
