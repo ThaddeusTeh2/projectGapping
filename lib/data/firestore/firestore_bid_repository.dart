@@ -3,8 +3,10 @@
 // Places bids by updating the listing doc directly:
 // - listings/{listingId}.currentBid
 // - listings/{listingId}.hasBid
+// - listings/{listingId}.currentBidderId
 //
-// This intentionally does NOT create a separate `bids/{bidId}` document.
+// Also writes a bid-history record:
+// - bids/{bidId}
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,6 +48,7 @@ class FirestoreBidRepository implements BidRepository {
     final listingRef = _firestore
         .collection(FirestorePaths.listings)
         .doc(listingId);
+    final bidRef = _firestore.collection(FirestorePaths.bids).doc();
 
     try {
       await _firestore.runTransaction((tx) async {
@@ -94,6 +97,13 @@ class FirestoreBidRepository implements BidRepository {
           'currentBid': amount,
           'hasBid': true,
           'currentBidderId': user.uid,
+        });
+
+        tx.set(bidRef, <String, dynamic>{
+          'listingId': listingId,
+          'bidderId': user.uid,
+          'amount': amount,
+          'dateCreatedMillis': nowMillis,
         });
       });
     } on FirebaseException catch (e) {

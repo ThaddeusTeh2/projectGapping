@@ -194,7 +194,7 @@ class ListingDetailScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (isOwner) ...[
+              if (isOwner && !listing.isClosed) ...[
                 const SizedBox(height: 12),
                 _SectionCard(
                   title: 'Seller Controls',

@@ -287,7 +287,7 @@ class _CreateListingScreenState extends ConsumerState<CreateListingScreen> {
                               )
                             : ListView.separated(
                                 itemCount: visible.length,
-                                separatorBuilder: (_, __) =>
+                                separatorBuilder: (_, _) =>
                                     const ShadSeparator.horizontal(
                                       margin: EdgeInsets.zero,
                                       thickness: 1,

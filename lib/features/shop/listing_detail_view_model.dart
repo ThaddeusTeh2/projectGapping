@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../../core/utils/time.dart';
 import '../../di/providers.dart';
 import '../../domain/models/shop_listing.dart';
+import '../profile/profile_view_model.dart';
 
 // Listing detail ViewModel.
 // Responsibilities (SSOT Day 5):
@@ -106,6 +107,10 @@ class ListingDetailViewModel
 
         // Refresh detail after a successful bid.
         await _fetchListing();
+
+        // The Profile tab is kept alive in the indexed stack, so it won't
+        // necessarily refetch just because a bid was placed elsewhere.
+        ref.invalidate(profileViewModelProvider);
       } catch (e, st) {
         debugPrint('placeBid failed: $e');
         debugPrintStack(stackTrace: st);
@@ -141,6 +146,8 @@ class ListingDetailViewModel
           );
 
       await _fetchListing();
+
+      ref.invalidate(profileViewModelProvider);
     });
 
     state = state.copyWith(mutation: result);
@@ -176,6 +183,8 @@ class ListingDetailViewModel
           );
 
       await _fetchListing();
+
+      ref.invalidate(profileViewModelProvider);
     });
 
     state = state.copyWith(mutation: result);

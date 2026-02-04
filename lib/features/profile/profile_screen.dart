@@ -94,17 +94,23 @@ class _MyListingsSection extends StatelessWidget {
 
     return Column(
       children: [
-        for (final listing in listings)
+        for (var i = 0; i < listings.length; i++) ...[
           ShadCard(
             child: ListTile(
-              title: Text(listing.bikeTitle),
+              title: Text(listings[i].bikeTitle),
               subtitle: Text(
-                '${listing.brandLabel} · ${listing.category} · ${listing.displacementBucket}',
+                '${listings[i].brandLabel} · ${listings[i].category} · ${listings[i].displacementBucket}',
               ),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.go('/listing/${listing.id}'),
+              onTap: () => context.go('/listing/${listings[i].id}'),
             ),
           ),
+          if (i != listings.length - 1)
+            const ShadSeparator.horizontal(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              thickness: 1,
+            ),
+        ],
       ],
     );
   }
@@ -123,15 +129,21 @@ class _MyBidsSection extends StatelessWidget {
 
     return Column(
       children: [
-        for (final bid in bids)
+        for (var i = 0; i < bids.length; i++) ...[
           ShadCard(
             child: ListTile(
-              title: Text('Bid: ${bid.amount.toStringAsFixed(0)}'),
-              subtitle: Text('Listing: ${bid.listingId}'),
+              title: Text('Bid: ${bids[i].amount.toStringAsFixed(0)}'),
+              subtitle: Text('Listing: ${bids[i].listingId}'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.go('/listing/${bid.listingId}'),
+              onTap: () => context.go('/listing/${bids[i].listingId}'),
             ),
           ),
+          if (i != bids.length - 1)
+            const ShadSeparator.horizontal(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              thickness: 1,
+            ),
+        ],
       ],
     );
   }
