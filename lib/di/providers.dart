@@ -70,9 +70,9 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 });
 
 // Public display name lookup (public_users/{uid}).
-final displayNameByUidProvider = FutureProvider.autoDispose
+final displayNameByUidProvider = StreamProvider.autoDispose
     .family<String?, String>((ref, uid) {
-      return ref.watch(userRepositoryProvider).getPublicDisplayName(uid);
+      return ref.watch(userRepositoryProvider).watchPublicDisplayName(uid);
     });
 
 final authStateChangesProvider = StreamProvider<User?>((ref) {

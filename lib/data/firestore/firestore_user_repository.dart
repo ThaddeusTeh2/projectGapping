@@ -61,6 +61,20 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
+  Stream<String?> watchPublicDisplayName(String userId) {
+    return _publicUsers.doc(userId).snapshots().map((doc) {
+      final data = doc.data();
+      if (data == null) return null;
+      final value = data['displayName'];
+      if (value is String) {
+        final trimmed = value.trim();
+        return trimmed.isEmpty ? null : trimmed;
+      }
+      return null;
+    });
+  }
+
+  @override
   Future<void> ensurePublicUserDoc({
     required String userId,
     required String defaultDisplayName,

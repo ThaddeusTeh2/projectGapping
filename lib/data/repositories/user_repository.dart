@@ -14,6 +14,7 @@ abstract class UserRepository {
 
   // Public profile surface (public_users/{userId}).
   Future<String?> getPublicDisplayName(String userId);
+  Stream<String?> watchPublicDisplayName(String userId);
   Future<void> ensurePublicUserDoc({
     required String userId,
     required String defaultDisplayName,
