@@ -8,6 +8,7 @@ import '../../core/ui/empty_state_view.dart';
 import '../../core/ui/error_state_view.dart';
 import '../../core/ui/loading_view.dart';
 import '../../core/utils/time.dart';
+import '../../di/providers.dart';
 import '../../domain/enums.dart';
 import '../../domain/models/shop_listing.dart';
 import 'shop_directory_view_model.dart';
@@ -315,14 +316,19 @@ class _ShopDirectoryScreenState extends ConsumerState<ShopDirectoryScreen> {
 
 enum _ShopFilterMenuAction { brand, category, displacement, clear }
 
-class _ListingCard extends StatelessWidget {
+class _ListingCard extends ConsumerWidget {
   const _ListingCard({required this.listing, required this.onTap});
 
   final ShopListing listing;
   final VoidCallback onTap;
 
+  String _shortUid(String value) {
+    if (value.length <= 8) return value;
+    return '${value.substring(0, 4)}…${value.substring(value.length - 4)}';
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final now = nowMillis();
     final remaining = Duration(
       milliseconds: (listing.closingTimeMillis - now).clamp(0, 1 << 62),
@@ -340,6 +346,14 @@ class _ListingCard extends StatelessWidget {
         listing.displacementBucket;
 
     final winnerId = listing.winnerUserId ?? listing.currentBidderId;
+    final winnerName = winnerId == null
+        ? null
+        : ref.watch(displayNameByUidProvider(winnerId)).valueOrNull;
+    final winnerLabel = winnerId == null
+        ? null
+        : (winnerName == null || winnerName.trim().isEmpty
+              ? _shortUid(winnerId)
+              : winnerName.trim());
     final finalPrice = listing.closingBid ?? listing.currentBid;
 
     final bidLabel = listing.isClosed
@@ -356,7 +370,7 @@ class _ListingCard extends StatelessWidget {
         subtitle: Text(
           '${listing.brandLabel} · ${listing.category} · $bucketLabel\n'
           '$bidLabel · ${listing.isClosed ? 'Status: Closed' : 'Closes in: $closesIn'}'
-          '${listing.isClosed && winnerId != null ? '\nWinner: $winnerId' : ''}',
+          '${listing.isClosed && winnerLabel != null ? '\nWinner: $winnerLabel' : ''}',
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

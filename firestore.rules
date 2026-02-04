@@ -148,37 +148,26 @@ service cloud.firestore {
         && request.auth.uid != resource.data.sellerId
         // Treat missing isClosed as "not closed" for older docs.
         && resource.data.isClosed != true
-        // Note: we intentionally do NOT enforce `closingTimeMillis` using
-        // `request.time` here, because client-created listings can have clock
-        // skew vs server time, which would surface as a confusing
-        // PERMISSION_DENIED during bidding. The app enforces the cutoff in the
-        // repository/ViewModel for demo correctness.
-        // Only allow bidders to change the bid state fields.
-        // Use diff().affectedKeys() so this works consistently for update() and
-        // set(..., merge: true) style writes.
-        // && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-        //   'hasBid',
-        //   'currentBid',
-        //   'currentBidderId'
-        // ])
-        // && request.resource.data.hasBid == true
-        // && isNumber(request.resource.data.currentBid)
-        // && request.resource.data.currentBid > 0
-        // && request.resource.data.currentBidderId == request.auth.uid
-        // && (
-        //   // First bid
-        //   (
-        //     (resource.data.currentBid == null || !isNumber(resource.data.currentBid))
-        //     // Don't compare against `startingBid` in rules to avoid int/float
-        //     // type-mismatch surprises (the app enforces the minimum).
-        //   )
-        //   ||
-        //   // Subsequent bids
-        //   (
-        //     isNumber(resource.data.currentBid)
-        //     && request.resource.data.currentBid > resource.data.currentBid
-        //   )
-        // );
+        // Only allow bid-state field updates.
+        && request.writeFields.hasOnly(['hasBid', 'currentBid', 'currentBidderId'])
+        && request.resource.data.hasBid == true
+        && isNumber(request.resource.data.currentBid)
+        && request.resource.data.currentBid > 0
+        && request.resource.data.currentBidderId == request.auth.uid;
+
+      allow delete: if false;
+    }
+
+    // Public profile surface (MVP): anyone can read displayName.
+    match /public_users/{userId} {
+      allow read: if true;
+
+      allow create, update: if isOwner(userId)
+        && hasOnlyKeys(['displayName', 'updatedAtMillis'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 3
+        && request.resource.data.displayName.size() <= 24
+        && request.resource.data.updatedAtMillis is int;
 
       allow delete: if false;
     }

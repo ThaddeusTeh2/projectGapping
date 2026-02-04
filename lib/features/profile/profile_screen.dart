@@ -8,6 +8,7 @@ import '../../core/ui/app_snackbar.dart';
 import '../../core/ui/empty_state_view.dart';
 import '../../core/ui/error_state_view.dart';
 import '../../core/ui/loading_view.dart';
+import '../../core/validation/validators.dart';
 import '../../di/providers.dart';
 import '../../domain/models/bid.dart';
 import '../../domain/models/shop_listing.dart';
@@ -38,13 +39,70 @@ class ProfileScreen extends ConsumerWidget {
         data: (profile) {
           return ListView(
             children: [
-              Text('User: ${profile.email}'),
+              Text(
+                profile.displayName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 4),
+              Text('Email: ${profile.email}'),
               const SizedBox(height: 4),
               if (auth.currentUser?.uid != null)
                 Text(
                   'UID: ${auth.currentUser!.uid}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
+              const SizedBox(height: 12),
+              ShadButton.outline(
+                onPressed: () async {
+                  final controller = TextEditingController(
+                    text: profile.displayName,
+                  );
+                  final formKey = GlobalKey<FormState>();
+
+                  final result = await showDialog<String?>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Edit display name'),
+                        content: Form(
+                          key: formKey,
+                          child: ShadInputFormField(
+                            controller: controller,
+                            label: const Text('Display name'),
+                            validator: Validators.displayName,
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, null),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              final ok =
+                                  formKey.currentState?.validate() ?? false;
+                              if (!ok) return;
+                              Navigator.pop(context, controller.text.trim());
+                            },
+                            child: const Text('Save'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (result == null || result.isEmpty) return;
+                  try {
+                    await viewModel.updateDisplayName(result);
+                    if (!context.mounted) return;
+                    AppSnackbar.showSuccess(context, 'Display name updated');
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    AppSnackbar.showError(context, e.toString());
+                  }
+                },
+                child: const Text('Edit Display Name'),
+              ),
               const SizedBox(height: 12),
               ShadButton(
                 onPressed: () async {

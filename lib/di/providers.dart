@@ -69,6 +69,12 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
   );
 });
 
+// Public display name lookup (public_users/{uid}).
+final displayNameByUidProvider = FutureProvider.autoDispose
+    .family<String?, String>((ref, uid) {
+      return ref.watch(userRepositoryProvider).getPublicDisplayName(uid);
+    });
+
 final authStateChangesProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });

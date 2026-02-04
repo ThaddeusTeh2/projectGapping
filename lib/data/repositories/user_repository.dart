@@ -12,6 +12,19 @@ abstract class UserRepository {
     required int userDateCreatedMillis,
   });
 
+  // Public profile surface (public_users/{userId}).
+  Future<String?> getPublicDisplayName(String userId);
+  Future<void> ensurePublicUserDoc({
+    required String userId,
+    required String defaultDisplayName,
+    required int updatedAtMillis,
+  });
+  Future<void> setPublicDisplayName({
+    required String userId,
+    required String displayName,
+    required int updatedAtMillis,
+  });
+
   Future<List<ShopListing>> listMyListings(String userId, {int limit = 50});
   Future<List<Bid>> listMyBids(String userId, {int limit = 50});
 }
