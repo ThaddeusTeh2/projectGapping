@@ -14,6 +14,12 @@ class Validators {
   static const int displayNameMinLength = 3;
   static const int displayNameMaxLength = 24;
   static final RegExp _displayNameAllowed = RegExp(r'^[a-zA-Z0-9 _-]+$');
+   // constructs the pattern using a raw string (r'...'),
+  //which tells Dart not to treat backslashes as escapes—useful for regex. 
+  //The pattern is anchored with ^ (start of string) and $ (end of string), 
+  //so it requires the entire input to match. Inside the character class [a-zA-Z0-9 _-], 
+  //it allows uppercase letters A-Z, lowercase letters a-z, digits 0-9, a space, underscore _, and hyphen -. 
+  //The + quantifier means “one or more”, so an empty string would not be considered valid.
 
   static String? email(String? value) {
     final v = (value ?? '').trim();
